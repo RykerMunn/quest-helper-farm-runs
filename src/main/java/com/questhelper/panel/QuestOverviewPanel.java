@@ -48,6 +48,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.plaf.basic.BasicButtonUI;
 import java.awt.*;
 import java.awt.event.ItemEvent;
@@ -233,7 +234,7 @@ public class QuestOverviewPanel extends JPanel
 		return dropdown;
 	}
 
-	private JPanel makeDropdownPanel(JComboBox dropdown, String name)
+	private JPanel makeDropdownPanel(JComponent dropdown, String name)
 	{
 		// Filters
 		JTextArea filterName = JGenerator.makeJTextArea(name);
@@ -246,6 +247,43 @@ public class QuestOverviewPanel extends JPanel
 		filtersPanel.add(dropdown, BorderLayout.EAST);
 
 		return filtersPanel;
+	}
+
+	private MultiCheckBoxCombo<Enum> makeNewMultiSelect(Enum[] values, String name)
+	{
+		MultiCheckBoxCombo<Enum> multiCheckBoxCombo = new MultiCheckBoxCombo<>(Arrays.asList(values));
+		multiCheckBoxCombo.addListSelectionListener(new ListSelectionListener()
+		{
+			@Override
+			public void valueChanged(javax.swing.event.ListSelectionEvent e)
+			{
+				if (!e.getValueIsAdjusting())
+				{
+					questHelperPlugin.getConfigManager().setRSProfileConfiguration(QuestHelperConfig.QUEST_BACKGROUND_GROUP, name,
+						multiCheckBoxCombo.getSelectedItems());
+				}
+			}
+		});
+
+		String currentVal = questHelperPlugin.getConfigManager().getRSProfileConfiguration(QuestHelperConfig.QUEST_BACKGROUND_GROUP, name);
+		List<Enum> selectedItems = new ArrayList<>();
+		if (currentVal != null)
+		{
+			String[] split = currentVal.split(",");
+			for (String s : split)
+			{
+				for (Enum value : values)
+				{
+					if (value.name().equals(s))
+					{
+						selectedItems.add(value);
+					}
+				}
+			}
+		}
+		multiCheckBoxCombo.setSelectedItems(selectedItems);
+		multiCheckBoxCombo.setPreferredSize(new Dimension(QuestHelperPanel.DROPDOWN_WIDTH, QuestHelperPanel.DROPDOWN_HEIGHT));
+		return multiCheckBoxCombo;
 	}
 
 	public void addQuest(QuestHelper quest, boolean isActive)
@@ -409,11 +447,22 @@ public class QuestOverviewPanel extends JPanel
 			List<HelperConfig> configs = quest.getConfigs();
 			for (HelperConfig config : configs)
 			{
-				var dropdown = makeNewDropdown(config.getEnums(), config.getKey());
-				JPanel dropdownPanel = makeDropdownPanel(dropdown, config.getName());
-				dropdownPanel.setPreferredSize(new Dimension(PANEL_WIDTH, QuestHelperPanel.DROPDOWN_HEIGHT));
+				if (config.isAllowMultiple())
+				{
+					var list = makeNewMultiSelect(config.getEnums(), config.getKey());
+					JPanel listPanel = makeDropdownPanel(list, config.getName());
+					listPanel.setPreferredSize(new Dimension(QuestHelperPanel.DROPDOWN_WIDTH, QuestHelperPanel.DROPDOWN_HEIGHT));
 
-				configContainer.add(dropdownPanel);
+					configContainer.add(listPanel);
+				}
+				else
+				{
+					var dropdown = makeNewDropdown(config.getEnums(), config.getKey());
+					JPanel dropdownPanel = makeDropdownPanel(dropdown, config.getName());
+					dropdownPanel.setPreferredSize(new Dimension(QuestHelperPanel.DROPDOWN_WIDTH, QuestHelperPanel.DROPDOWN_HEIGHT));
+
+					configContainer.add(dropdownPanel);
+				}
 			}
 		}
 

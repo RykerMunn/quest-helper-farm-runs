@@ -103,8 +103,39 @@ public class HerbRun extends ComplexStateQuestHelper
 		FARMING();
 	}
 
+	private enum PatchType {
+		ALLOTMENT(1 << 0),
+		FLOWER(1 << 1),
+		HERB(1 << 2),
+		HOPS(1 << 3),
+		BUSHES(1 << 4),
+		TREES(1 << 5),
+		FRUIT_TREES(1 << 6),
+		SPECIAL(1 << 7),
+		SPECIAL_TREES(1 << 8),
+		CACTUS(1 << 9);
+
+		private final int mask;
+
+		PatchType(int mask) {
+			this.mask = mask;
+		}
+
+		public int getMask() {
+			return mask;
+		}
+
+		@Override
+		public String toString() {
+			String name = name().replace("_", " ");
+			// Capitalize the first letter of each word
+			return name.substring(0, 1) + name.substring(1).toLowerCase();
+		}
+	}
+
 	private final String HERB_SEEDS = "herbSeeds";
 	private final String GRACEFUL_OR_FARMING = "gracefulOrFarming";
+	private final String PATCH_SELECTION = "patchSelection";
 
 	@Override
 	public QuestStep loadStep()
@@ -489,9 +520,11 @@ public class HerbRun extends ComplexStateQuestHelper
 	@Override
 	public List<HelperConfig> getConfigs()
 	{
+		HelperConfig patchConfig = new HelperConfig("Patches", PATCH_SELECTION, PatchType.values());
+		patchConfig.setAllowMultiple(true);
 		HelperConfig seedsConfig = new HelperConfig("Seeds", HERB_SEEDS, Seed.values());
 		HelperConfig outfitConfig = new HelperConfig("Outfit", GRACEFUL_OR_FARMING, GracefulOrFarming.values());
-		return Arrays.asList(seedsConfig, outfitConfig);
+		return Arrays.asList(patchConfig, seedsConfig, outfitConfig);
 	}
 
 	@Override

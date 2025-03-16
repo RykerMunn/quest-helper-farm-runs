@@ -4,6 +4,8 @@ import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
 
 public class HelperConfig
 {
@@ -13,6 +15,8 @@ public class HelperConfig
 	String key;
 	@Getter
 	Enum[] enums;
+	@Getter @Setter
+	boolean allowMultiple = false;
 	public HelperConfig(String name, String key, Enum[] enums)
 	{
 		this.name = name;
