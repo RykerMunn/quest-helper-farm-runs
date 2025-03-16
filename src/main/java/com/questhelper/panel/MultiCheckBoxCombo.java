@@ -20,6 +20,8 @@ import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionListener;
 
+import net.runelite.client.util.Text;
+
 
 public class MultiCheckBoxCombo<T> extends JPanel {
     private JButton comboButton;
@@ -27,6 +29,7 @@ public class MultiCheckBoxCombo<T> extends JPanel {
     private JList<T> list;
     private DefaultListModel<T> listModel;
     private List<T> selectedItems = new ArrayList<>();
+    private List<ListSelectionListener> listeners = new ArrayList<>();
 
     public MultiCheckBoxCombo(List<T> items) {
         setLayout(new BorderLayout());
@@ -59,6 +62,10 @@ public class MultiCheckBoxCombo<T> extends JPanel {
 				{
 					updateSelectedItems();
                     updateButtonText();
+
+                    for (ListSelectionListener listener : listeners) {
+                        listener.valueChanged(e);
+                    }
 				}
 			}
 		});
@@ -73,8 +80,15 @@ public class MultiCheckBoxCombo<T> extends JPanel {
         if (selectedItems.isEmpty()) {
             comboButton.setText("Select...");
         } else {
-            comboButton.setText(selectedItems.toString());
-            comboButton.setToolTipText(selectedItems.toString());
+            StringBuilder sb = new StringBuilder();
+            for (T item : selectedItems) {
+                if (sb.length() > 0) {
+                    sb.append(", ");
+                }
+                sb.append(item instanceof Enum ? Text.titleCase((Enum)item) : item.toString());
+            }
+            comboButton.setText(sb.toString());
+            comboButton.setToolTipText(sb.toString());
         }
     }
 
@@ -94,7 +108,7 @@ public class MultiCheckBoxCombo<T> extends JPanel {
     }
 
     public void addListSelectionListener(ListSelectionListener listener) {
-        list.addListSelectionListener(listener);
+        listeners.add(listener);
     }
     
     private class CheckBoxListCellRenderer extends JCheckBox implements ListCellRenderer<T> {
@@ -104,7 +118,7 @@ public class MultiCheckBoxCombo<T> extends JPanel {
                                                       int index,
                                                       boolean isSelected,
                                                       boolean cellHasFocus) {
-            setText(value.toString());
+            setText(value instanceof Enum ? Text.titleCase((Enum)value) :  value.toString());
             setSelected(isSelected);
             setBackground(list.getBackground());
             setForeground(list.getForeground());

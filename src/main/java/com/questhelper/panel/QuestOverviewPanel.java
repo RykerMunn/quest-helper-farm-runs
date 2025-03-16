@@ -269,12 +269,14 @@ public class QuestOverviewPanel extends JPanel
 		List<Enum> selectedItems = new ArrayList<>();
 		if (currentVal != null)
 		{
+			// when a List gets stringified, it adds square brackets around it, so we need to remove those
+			currentVal = currentVal.substring(1, currentVal.length() - 1);
 			String[] split = currentVal.split(",");
 			for (String s : split)
 			{
 				for (Enum value : values)
 				{
-					if (value.name().equals(s))
+					if (value.name().equals(s.trim()))
 					{
 						selectedItems.add(value);
 					}
