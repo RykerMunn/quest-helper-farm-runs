@@ -1,0 +1,8 @@
+{
+	"java.compile.nullAnalysis.mode": "automatic",
+	"java.format.enabled": true,
+	"java.format.settings.url": "https://gist.github.com/RykerMunn/407a8aaba7398341bad850b8da3f5f70",
+	"[java]": {
+		"editor.defaultFormatter": "redhat.java"
+	}
+}
