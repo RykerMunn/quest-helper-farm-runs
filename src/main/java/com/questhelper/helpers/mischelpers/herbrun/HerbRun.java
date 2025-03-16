@@ -46,6 +46,7 @@ import com.questhelper.steps.ObjectStep;
 import com.questhelper.steps.QuestStep;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import javax.inject.Inject;
 import net.runelite.api.ItemID;
@@ -82,6 +83,9 @@ public class HerbRun extends ComplexStateQuestHelper
 	ManualRequirement ardougneEmpty, catherbyEmpty, faladorEmpty, farmingGuildEmpty, harmonyEmpty, morytaniaEmpty, trollStrongholdEmpty, weissEmpty, hosidiusEmpty, varlamoreEmpty;
 	ManualRequirement ardougneReady, catherbyReady, faladorReady, farmingGuildReady, harmonyReady, morytaniaReady, trollStrongholdReady, weissReady, hosidiusReady, varlamoreReady;
 
+	ManualRequirement patchTypesSelected;
+	DetailedQuestStep selectingPatchTypeStep;
+
 	private enum Seed {
 		GUAM(ItemID.GUAM_SEED), MARRENTILL(ItemID.MARRENTILL_SEED), TARROMIN(ItemID.TARROMIN_SEED), HARRALANDER(ItemID.HARRALANDER_SEED),
 		RANARR(ItemID.RANARR_SEED), TOADFLAX(ItemID.TOADFLAX_SEED), IRIT(ItemID.IRIT_SEED), AVANTOE(ItemID.AVANTOE_SEED), KWUARM(ItemID.KWUARM_SEED),
@@ -102,36 +106,6 @@ public class HerbRun extends ComplexStateQuestHelper
 		FARMING();
 	}
 
-	private enum PatchType {
-		ALLOTMENT(1 << 0),
-		FLOWER(1 << 1),
-		HERB(1 << 2),
-		HOPS(1 << 3),
-		BUSHES(1 << 4),
-		TREES(1 << 5),
-		FRUIT_TREES(1 << 6),
-		SPECIAL(1 << 7),
-		SPECIAL_TREES(1 << 8),
-		CACTUS(1 << 9);
-
-		private final int mask;
-
-		PatchType(int mask) {
-			this.mask = mask;
-		}
-
-		public int getMask() {
-			return mask;
-		}
-
-		@Override
-		public String toString() {
-			String name = name().replace("_", " ");
-			// Capitalize the first letter of each word
-			return name.substring(0, 1) + name.substring(1).toLowerCase();
-		}
-	}
-
 	private final String HERB_SEEDS = "herbSeeds";
 	private final String GRACEFUL_OR_FARMING = "gracefulOrFarming";
 	private final String PATCH_SELECTION = "patchSelection";
@@ -143,8 +117,9 @@ public class HerbRun extends ComplexStateQuestHelper
 		initializeRequirements();
 		setupConditions();
 		setupSteps();
-
+		
 		ConditionalStep steps = new ConditionalStep(this, waitForHerbs, spade, dibber, rake, seed, magicSec, farmersOutfit, gracefulOutfit);
+		steps.addStep(patchTypesSelected, selectingPatchTypeStep);
 		steps.addStep(faladorReady, faladorPatch);
 		steps.addStep(faladorEmpty, faladorPlant);
 
@@ -206,6 +181,7 @@ public class HerbRun extends ComplexStateQuestHelper
 	@Override
 	protected void setupRequirements()
 	{
+		patchTypesSelected = new ManualRequirement();
 		accessToFarmingGuildPatch = new SkillRequirement(Skill.FARMING, 65);
 
 		accessToHarmony = new QuestRequirement(QuestHelperQuest.MORYTANIA_ELITE, QuestState.FINISHED);
@@ -213,11 +189,13 @@ public class HerbRun extends ComplexStateQuestHelper
 		accessToTrollStronghold = new QuestRequirement(QuestHelperQuest.MY_ARMS_BIG_ADVENTURE, QuestState.FINISHED);
 		accessToVarlamore = new QuestRequirement(QuestHelperQuest.CHILDREN_OF_THE_SUN, QuestState.FINISHED);
 
-		spade = new ItemRequirement("Spade", ItemID.SPADE);
-		dibber = new ItemRequirement("Seed dibber", ItemID.SEED_DIBBER);
-		rake = new ItemRequirement("Rake", ItemID.RAKE).hideConditioned(new VarbitRequirement(Varbits.AUTOWEED, 2));
+		spade = new ItemRequirement("Spade", ItemID.SPADE).showConditioned(patchTypesSelected);
+		dibber = new ItemRequirement("Seed dibber", ItemID.SEED_DIBBER).showConditioned(patchTypesSelected);
+		rake = new ItemRequirement("Rake", ItemID.RAKE).hideConditioned(new VarbitRequirement(Varbits.AUTOWEED, 2)).showConditioned(patchTypesSelected);
 
-		seed = new ItemRequirement("Seeds of your choice", ItemID.GUAM_SEED);
+		seed = new ItemRequirement("Seeds of your choice", ItemID.GUAM_SEED).showConditioned(patchTypesSelected);
+
+		
 
 		String seedName = configManager.getRSProfileConfiguration(QuestHelperConfig.QUEST_BACKGROUND_GROUP, HERB_SEEDS);
 
@@ -235,41 +213,62 @@ public class HerbRun extends ComplexStateQuestHelper
 		{
 			configManager.setConfiguration(QuestHelperConfig.QUEST_BACKGROUND_GROUP, HERB_SEEDS, Seed.GUAM);
 		}
-		compost = new ItemRequirement("Compost", ItemCollections.COMPOST);
+		compost = new ItemRequirement("Compost", ItemCollections.COMPOST)
+			.showConditioned(patchTypesSelected);
 		compost.setDisplayMatchedItemName(true);
-		ectophial = new ItemRequirement("Ectophial", ItemID.ECTOPHIAL).showConditioned(new QuestRequirement(QuestHelperQuest.GHOSTS_AHOY, QuestState.FINISHED));
+		ectophial = new ItemRequirement("Ectophial", ItemID.ECTOPHIAL)
+			.showConditioned(new QuestRequirement(QuestHelperQuest.GHOSTS_AHOY, QuestState.FINISHED))
+			.showConditioned(patchTypesSelected);
 		ectophial.addAlternates(ItemID.ECTOPHIAL_4252);
-		magicSec = new ItemRequirement("Magic secateurs", ItemID.MAGIC_SECATEURS).showConditioned(new QuestRequirement(QuestHelperQuest.FAIRYTALE_I__GROWING_PAINS, QuestState.FINISHED));
-		explorerRing2 = new ItemRequirement("Explorers' ring 2+", ItemID.EXPLORERS_RING_2).showConditioned(new QuestRequirement(QuestHelperQuest.LUMBRIDGE_MEDIUM, QuestState.FINISHED));
+		magicSec = new ItemRequirement("Magic secateurs", ItemID.MAGIC_SECATEURS)
+			.showConditioned(new QuestRequirement(QuestHelperQuest.FAIRYTALE_I__GROWING_PAINS, QuestState.FINISHED))
+			.showConditioned(patchTypesSelected);
+		explorerRing2 = new ItemRequirement("Explorers' ring 2+", ItemID.EXPLORERS_RING_2)
+			.showConditioned(new QuestRequirement(QuestHelperQuest.LUMBRIDGE_MEDIUM, QuestState.FINISHED))
+			.showConditioned(patchTypesSelected);
 		explorerRing2.addAlternates(ItemID.EXPLORERS_RING_3, ItemID.EXPLORERS_RING_4);
-		ardyCloak2 = new ItemRequirement("Ardougne cloak 2+", ItemID.ARDOUGNE_CLOAK_2).showConditioned(new QuestRequirement(QuestHelperQuest.ARDOUGNE_MEDIUM, QuestState.FINISHED));
+		ardyCloak2 = new ItemRequirement("Ardougne cloak 2+", ItemID.ARDOUGNE_CLOAK_2)
+			.showConditioned(new QuestRequirement(QuestHelperQuest.ARDOUGNE_MEDIUM, QuestState.FINISHED))
+			.showConditioned(patchTypesSelected);
 		ardyCloak2.addAlternates(ItemID.ARDOUGNE_CLOAK_3, ItemID.ARDOUGNE_CLOAK_4);
-		xericsTalisman = new ItemRequirement("Xeric's talisman", ItemID.XERICS_TALISMAN);
+		xericsTalisman = new ItemRequirement("Xeric's talisman", ItemID.XERICS_TALISMAN)
+			.showConditioned(patchTypesSelected);
 
-		hosidiusHouseTeleport = new ItemRequirement("Teleport to Hosidius House", ItemID.HOSIDIUS_TELEPORT);
+		hosidiusHouseTeleport = new ItemRequirement("Teleport to Hosidius House", ItemID.HOSIDIUS_TELEPORT)
+			.showConditioned(patchTypesSelected);
 		hosidiusHouseTeleport.addAlternates(ItemID.XERICS_TALISMAN);
 
 		ItemRequirement catherbyRunes = new ItemRequirements("Catherby teleport runes", new ItemRequirement("Law rune",
 			ItemID.LAW_RUNE), new ItemRequirement("Air rune", ItemID.AIR_RUNE, 5));
 		ItemRequirement catherbyTablet = new ItemRequirement("Catherby tablet", ItemID.CATHERBY_TELEPORT);
 
-		catherbyTeleport = new ItemRequirements(LogicType.OR, "Catherby teleport", catherbyRunes, catherbyTablet);
+		catherbyTeleport = new ItemRequirements(LogicType.OR, "Catherby teleport", catherbyRunes, catherbyTablet)
+			.showConditioned(patchTypesSelected);
 
 		ItemRequirement trollheimRunes = new ItemRequirements("Trollheim teleport runes", new ItemRequirement("Law rune",
 			ItemID.LAW_RUNE, 2), new ItemRequirement("Fire rune", ItemID.FIRE_RUNE, 2));
 		ItemRequirement trollheimTablet = new ItemRequirement("Trollheim tablet", ItemID.TROLLHEIM_TELEPORT);
 		trollheimTeleport = new ItemRequirements(LogicType.OR, "Trollheim teleport", trollheimRunes, trollheimTablet)
-			.hideConditioned(new QuestRequirement(QuestHelperQuest.MAKING_FRIENDS_WITH_MY_ARM, QuestState.FINISHED));
+			.hideConditioned(new QuestRequirement(QuestHelperQuest.MAKING_FRIENDS_WITH_MY_ARM, QuestState.FINISHED))
+			.showConditioned(patchTypesSelected);
 
-		icyBasalt = new ItemRequirement("Icy basalt", ItemID.ICY_BASALT).showConditioned(new QuestRequirement(QuestHelperQuest.MAKING_FRIENDS_WITH_MY_ARM, QuestState.FINISHED));
-		stonyBasalt = new ItemRequirement("Stony basalt", ItemID.STONY_BASALT).showConditioned(new QuestRequirement(QuestHelperQuest.MAKING_FRIENDS_WITH_MY_ARM, QuestState.FINISHED));
+		icyBasalt = new ItemRequirement("Icy basalt", ItemID.ICY_BASALT)
+			.showConditioned(new QuestRequirement(QuestHelperQuest.MAKING_FRIENDS_WITH_MY_ARM, QuestState.FINISHED))
+			.showConditioned(patchTypesSelected);
+		stonyBasalt = new ItemRequirement("Stony basalt", ItemID.STONY_BASALT)
+			.showConditioned(new QuestRequirement(QuestHelperQuest.MAKING_FRIENDS_WITH_MY_ARM, QuestState.FINISHED))
+			.showConditioned(patchTypesSelected);
 
-		farmingGuildTeleport = new ItemRequirement("Farming guild teleport (Skills' Necklace or CIR fairy ring)", ItemID.FARMING_CAPET).showConditioned(accessToFarmingGuildPatch);
+		farmingGuildTeleport = new ItemRequirement("Farming guild teleport (Skills' Necklace or CIR fairy ring)", ItemID.FARMING_CAPET)
+			.showConditioned(accessToFarmingGuildPatch)
+			.showConditioned(patchTypesSelected);
 		farmingGuildTeleport.addAlternates(ItemID.FARMING_CAPE);
 		farmingGuildTeleport.addAlternates(ItemCollections.SKILLS_NECKLACES);
 		farmingGuildTeleport.addAlternates(ItemCollections.FAIRY_STAFF);
 
-		hunterWhistle = new ItemRequirement("Quetzal whistle", ItemID.PERFECTED_QUETZAL_WHISTLE).showConditioned(accessToVarlamore);
+		hunterWhistle = new ItemRequirement("Quetzal whistle", ItemID.PERFECTED_QUETZAL_WHISTLE)
+			.showConditioned(accessToVarlamore)
+			.showConditioned(patchTypesSelected);
 		hunterWhistle.addAlternates(ItemID.BASIC_QUETZAL_WHISTLE);
 		hunterWhistle.addAlternates(ItemID.ENHANCED_QUETZAL_WHISTLE);
 
@@ -295,7 +294,9 @@ public class HerbRun extends ComplexStateQuestHelper
 		gracefulOutfit = new ItemRequirements(
 			"Graceful outfit (equipped)",
 			gracefulHood, gracefulTop, gracefulLegs, gracefulGloves, gracefulBoots, gracefulCape
-		).isNotConsumed().showConditioned(new RuneliteRequirement(configManager, GRACEFUL_OR_FARMING, GracefulOrFarming.GRACEFUL.name()));
+		).isNotConsumed()
+			.showConditioned(new RuneliteRequirement(configManager, GRACEFUL_OR_FARMING, GracefulOrFarming.GRACEFUL.name()))
+			.showConditioned(patchTypesSelected);
 
 		farmingHat = new ItemRequirement(
 			"Farmer's strawhat", ItemID.FARMERS_STRAWHAT, 1 ,true).isNotConsumed();
@@ -318,7 +319,9 @@ public class HerbRun extends ComplexStateQuestHelper
 		farmersOutfit = new ItemRequirements(
 			"Farmer's outfit (equipped)",
 			farmingHat, farmingTop, farmingLegs, farmingBoots
-		).isNotConsumed().showConditioned(new RuneliteRequirement(configManager, GRACEFUL_OR_FARMING, GracefulOrFarming.FARMING.name()));
+		).isNotConsumed()
+		.showConditioned(new RuneliteRequirement(configManager, GRACEFUL_OR_FARMING, GracefulOrFarming.FARMING.name()))
+		.showConditioned(patchTypesSelected);
 	}
 
 	public void setupSteps()
@@ -391,6 +394,8 @@ public class HerbRun extends ComplexStateQuestHelper
 		varlamorePlant.conditionToHideInSidebar(new Conditions(LogicType.NOR, accessToVarlamore));
 		varlamorePlant.addIcon(ItemID.RANARR_SEED);
 		varlamorePatch.addSubSteps(varlamorePlant);
+		
+		selectingPatchTypeStep = new DetailedQuestStep(this, "Select the patch types in the configuration section to see detailed requirements.");
 	}
 
 	@Subscribe
@@ -418,6 +423,15 @@ public class HerbRun extends ComplexStateQuestHelper
 		if (event.getKey().equals(GRACEFUL_OR_FARMING))
 		{
 			questHelperPlugin.refreshBank();
+		}
+
+		if (event.getKey().equals(PATCH_SELECTION))
+		{
+			String valueTest = event.getNewValue();
+			if (valueTest != null && !valueTest.isEmpty())
+			{
+				patchTypesSelected.setShouldPass(true);
+			}
 		}
 	}
 
@@ -519,7 +533,7 @@ public class HerbRun extends ComplexStateQuestHelper
 	@Override
 	public List<HelperConfig> getConfigs()
 	{
-		HelperConfig patchConfig = new HelperConfig("Patches", PATCH_SELECTION, PatchType.values());
+		HelperConfig patchConfig = new HelperConfig("Patches", PATCH_SELECTION, PatchImplementation.values());
 		patchConfig.setAllowMultiple(true);
 		HelperConfig seedsConfig = new HelperConfig("Seeds", HERB_SEEDS, Seed.values());
 		HelperConfig outfitConfig = new HelperConfig("Outfit", GRACEFUL_OR_FARMING, GracefulOrFarming.values());
@@ -530,10 +544,25 @@ public class HerbRun extends ComplexStateQuestHelper
 	public List<PanelDetails> getPanels()
 	{
 		List<PanelDetails> allSteps = new ArrayList<>();
-		allSteps.add(new PanelDetails("Farm run", Arrays.asList(faladorPatch, ardougnePatch, catherbyPatch, morytaniaPatch, hosidiusPatch,
+		allSteps.add(new PanelDetails("Farm run", Arrays.asList(selectingPatchTypeStep, faladorPatch, ardougnePatch, catherbyPatch, morytaniaPatch, hosidiusPatch,
 			trollStrongholdPatch, weissPatch, farmingGuildPatch, harmonyPatch, varlamorePatch), Arrays.asList(spade, dibber, rake, seed, magicSec),
 			Arrays.asList(compost, ectophial, explorerRing2, ardyCloak2, xericsTalisman, catherbyTeleport, trollheimTeleport, icyBasalt, stonyBasalt, farmingGuildTeleport, hunterWhistle, gracefulOutfit, farmersOutfit)));
 
 		return allSteps;
+	}
+
+	@Override
+	public void startUp(QuestHelperConfig helperConfig)
+	{
+		step = loadStep();
+		this.config = helperConfig;
+		instantiateSteps(Collections.singletonList(step));
+		var = getVar();
+		String patchSelectionTest = this.getConfigManager().getRSProfileConfiguration(QuestHelperConfig.QUEST_BACKGROUND_GROUP, PATCH_SELECTION);
+		if (patchSelectionTest == null || patchSelectionTest.isEmpty())
+		{
+			patchTypesSelected.setShouldPass(true);
+		}
+		startUpStep(step);
 	}
 }
