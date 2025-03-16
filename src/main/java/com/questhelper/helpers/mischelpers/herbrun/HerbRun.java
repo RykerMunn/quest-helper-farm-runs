@@ -77,6 +77,9 @@ public class HerbRun extends ComplexStateQuestHelper
 
 	private FarmingHandler farmingHandler;
 
+	private boolean bPatchesSelected = false;
+	private List<PatchImplementation> selectedPatches = new ArrayList<>();
+
 	DetailedQuestStep waitForHerbs, ardougnePatch, catherbyPatch, faladorPatch, farmingGuildPatch, harmonyPatch, morytaniaPatch, trollStrongholdPatch, weissPatch, hosidiusPatch, varlamorePatch;
 
 	DetailedQuestStep ardougnePlant, catherbyPlant, faladorPlant, farmingGuildPlant, harmonyPlant, morytaniaPlant, trollStrongholdPlant, weissPlant, hosidiusPlant, varlamorePlant;
@@ -91,7 +94,9 @@ public class HerbRun extends ComplexStateQuestHelper
 	ManualRequirement ardougneReady, catherbyReady, faladorReady, farmingGuildReady, harmonyReady, morytaniaReady, trollStrongholdReady, weissReady, hosidiusReady, varlamoreReady;
 
 	ManualRequirement patchTypesSelected;
-	DetailedQuestStep selectingPatchTypeStep;
+	DetailedQuestStep selectingPatchTypeStep;	
+
+	SeedsHelperConfig seedsConfig;
 
 	private enum Seed {
 		GUAM(ItemID.GUAM_SEED), MARRENTILL(ItemID.MARRENTILL_SEED), TARROMIN(ItemID.TARROMIN_SEED), HARRALANDER(ItemID.HARRALANDER_SEED),
@@ -438,6 +443,11 @@ public class HerbRun extends ComplexStateQuestHelper
 			if (valueTest != null && !valueTest.isEmpty())
 			{
 				patchTypesSelected.setShouldPass(true);
+				selectedPatches.clear();
+				selectedPatches.addAll(parsePatchImplementations(valueTest));
+				bPatchesSelected = true;
+				seedsConfig.setSelectedPatches(selectedPatches);
+				seedsConfig.refresh(questHelperPlugin.getConfigManager());
 			}
 		}
 	}
@@ -542,7 +552,7 @@ public class HerbRun extends ComplexStateQuestHelper
 	{
 		HelperConfig patchConfig = new HelperConfig("Patches", PATCH_SELECTION, PatchImplementation.values());
 		patchConfig.setAllowMultiple(true);
-		HelperConfig seedsConfig = new HelperConfig("Seeds", HERB_SEEDS, Seed.values());
+		seedsConfig = new SeedsHelperConfig("Seeds", HERB_SEEDS, Seed.values(), selectedPatches);
 		HelperConfig outfitConfig = new HelperConfig("Outfit", GRACEFUL_OR_FARMING, GracefulOrFarming.values());
 		return Arrays.asList(patchConfig, seedsConfig, outfitConfig);
 	}
@@ -569,7 +579,30 @@ public class HerbRun extends ComplexStateQuestHelper
 		if (patchSelectionTest == null || patchSelectionTest.isEmpty())
 		{
 			patchTypesSelected.setShouldPass(true);
+			bPatchesSelected = false;
+		}
+		else 
+		{
+			selectedPatches.clear();
+			selectedPatches.addAll(parsePatchImplementations(patchSelectionTest));
+			bPatchesSelected = true;
 		}
 		startUpStep(step);
+	}
+
+	private static List<PatchImplementation> parsePatchImplementations(String str)
+	{
+		List<PatchImplementation> patches = new ArrayList<>();
+		if (str  == null || str.isEmpty())
+		{
+			return patches;
+		}
+		var splits = str.replace("[", "").replace("]", "").split(",");
+		for (String split : splits)
+		{
+			patches.add(PatchImplementation.valueOf(split.trim()));
+		}
+
+		return patches;
 	}
 }

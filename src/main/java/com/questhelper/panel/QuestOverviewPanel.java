@@ -446,26 +446,7 @@ public class QuestOverviewPanel extends JPanel
 			configHeaderPanel.add(configHeaderText);
 			configContainer.add(configHeaderPanel);
 
-			List<HelperConfig> configs = quest.getConfigs();
-			for (HelperConfig config : configs)
-			{
-				if (config.isAllowMultiple())
-				{
-					var list = makeNewMultiSelect(config.getEnums(), config.getKey());
-					JPanel listPanel = makeDropdownPanel(list, config.getName());
-					listPanel.setPreferredSize(new Dimension(QuestHelperPanel.DROPDOWN_WIDTH, QuestHelperPanel.DROPDOWN_HEIGHT));
-
-					configContainer.add(listPanel);
-				}
-				else
-				{
-					var dropdown = makeNewDropdown(config.getEnums(), config.getKey());
-					JPanel dropdownPanel = makeDropdownPanel(dropdown, config.getName());
-					dropdownPanel.setPreferredSize(new Dimension(QuestHelperPanel.DROPDOWN_WIDTH, QuestHelperPanel.DROPDOWN_HEIGHT));
-
-					configContainer.add(dropdownPanel);
-				}
-			}
+			handleConfigurationRender(quest);
 		}
 
 		if (questHelperPlugin.getConfig().showFullRequirements())
@@ -705,5 +686,38 @@ public class QuestOverviewPanel extends JPanel
 			questStepPanel.updateRequirements(client);
 		});
 		revalidate();
+	}
+
+	private void handleConfigurationRender(QuestHelper quest)
+	{
+		List<HelperConfig> configs = quest.getConfigs();
+		for (HelperConfig config : configs)
+		{
+			if (config.isCustomRender())
+			{
+				var render = config.render(quest.getConfigManager());
+				if (render != null)
+				{
+					configContainer.add(render);
+				}
+				continue;
+			}
+			if (config.isAllowMultiple())
+			{
+				var list = makeNewMultiSelect(config.getEnums(), config.getKey());
+				JPanel listPanel = makeDropdownPanel(list, config.getName());
+				listPanel.setPreferredSize(new Dimension(QuestHelperPanel.DROPDOWN_WIDTH, QuestHelperPanel.DROPDOWN_HEIGHT));
+
+				configContainer.add(listPanel);
+			}
+			else
+			{
+				var dropdown = makeNewDropdown(config.getEnums(), config.getKey());
+				JPanel dropdownPanel = makeDropdownPanel(dropdown, config.getName());
+				dropdownPanel.setPreferredSize(new Dimension(QuestHelperPanel.DROPDOWN_WIDTH, QuestHelperPanel.DROPDOWN_HEIGHT));
+
+				configContainer.add(dropdownPanel);
+			}
+		}
 	}
 }
