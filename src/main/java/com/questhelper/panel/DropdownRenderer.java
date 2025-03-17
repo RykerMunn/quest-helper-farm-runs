@@ -49,8 +49,12 @@ public final class DropdownRenderer extends DefaultListCellRenderer
 			setBackground(list.getBackground());
 			setForeground(ColorScheme.LIGHT_GRAY_COLOR);
 		}
-
-		setText(Text.titleCase((Enum) o));
+		String text = o.toString();
+		if (o instanceof Enum)
+		{
+			text = Text.titleCase((Enum) o);
+		}
+		setText(text);
 
 		return this;
 	}

@@ -75,8 +75,10 @@ public class HerbRun extends ComplexStateQuestHelper
 	@Inject
 	private FarmingWorld farmingWorld;
 
-	private FarmingHandler farmingHandler;
+	@Inject 
+	private FarmingSeedFactory farmingSeedFactory;
 
+	private FarmingHandler farmingHandler;
 	private boolean bPatchesSelected = false;
 	private List<PatchImplementation> selectedPatches = new ArrayList<>();
 
@@ -552,7 +554,7 @@ public class HerbRun extends ComplexStateQuestHelper
 	{
 		HelperConfig patchConfig = new HelperConfig("Patches", PATCH_SELECTION, PatchImplementation.values());
 		patchConfig.setAllowMultiple(true);
-		seedsConfig = new SeedsHelperConfig("Seeds", HERB_SEEDS, Seed.values(), selectedPatches);
+		seedsConfig = new SeedsHelperConfig(farmingSeedFactory,"Seeds", HERB_SEEDS, Seed.values(), selectedPatches);
 		HelperConfig outfitConfig = new HelperConfig("Outfit", GRACEFUL_OR_FARMING, GracefulOrFarming.values());
 		return Arrays.asList(patchConfig, seedsConfig, outfitConfig);
 	}
