@@ -25,12 +25,16 @@ public class SeedsHelperConfig extends HelperConfig {
 
     private List<PatchImplementation> selectedPatches;
     private final JPanel filtersPanel = new JPanel(new SpringLayout());
+    private FarmingSeedFactory farmingSeedFactory;
 
-    public SeedsHelperConfig(String name, String key, Enum[] enums, List<PatchImplementation> selectedPatches) {
-        super(name, key, enums);
+    public SeedsHelperConfig(FarmingSeedFactory seedFactory, String name, List<PatchImplementation> selectedPatches) {
+        // empty key and null enum as customRender implements using PatchImplementation
+        super(name, "", null);
+        this.farmingSeedFactory = seedFactory;
         this.setCustomRender(true);
         this.selectedPatches = selectedPatches;
         this.filtersPanel.setMinimumSize(new Dimension(PluginPanel.PANEL_WIDTH, 0));
+
     }
 
     @Override
@@ -39,26 +43,26 @@ public class SeedsHelperConfig extends HelperConfig {
         return filtersPanel;
     }
 
-    public void refresh(ConfigManager configManager) {        
+    public void refresh(ConfigManager configManager) {
         renderInternal(configManager);
     }
 
-    private JComboBox<Enum> makeNewDropdown(ConfigManager configManager, Enum[] values, String key) {
-        JComboBox<Enum> dropdown = new JComboBox<>(values);
+    private JComboBox<FarmingSeed> makeNewDropdown(ConfigManager configManager, FarmingSeed[] values, String key) {
+        JComboBox<FarmingSeed> dropdown = new JComboBox<>(values);
         dropdown.setFocusable(false);
         dropdown.setForeground(Color.WHITE);
         dropdown.setRenderer(new DropdownRenderer());
         dropdown.addItemListener(e -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {
-                Enum source = (Enum) e.getItem();
+                FarmingSeed source = (FarmingSeed) e.getItem();
                 configManager.setRSProfileConfiguration(QuestHelperConfig.QUEST_BACKGROUND_GROUP,
                         key,
                         source);
             }
         });
         String currentVal = configManager.getRSProfileConfiguration(QuestHelperConfig.QUEST_BACKGROUND_GROUP, key);
-        for (Enum value : values) {
-            if (value.name().equals(currentVal)) {
+        for (FarmingSeed value : values) {
+            if (value.getSeedName().equals(currentVal)) {
                 dropdown.setSelectedItem(value);
             }
         }
@@ -69,7 +73,9 @@ public class SeedsHelperConfig extends HelperConfig {
     private void renderInternal(ConfigManager configManager) {
         filtersPanel.removeAll();
         for (PatchImplementation patch : selectedPatches) {
-            JComboBox<Enum> dropdown = makeNewDropdown(configManager, this.getEnums(), patch.name());
+
+            JComboBox<FarmingSeed> dropdown = makeNewDropdown(configManager, farmingSeedFactory.getValidSeeds(patch),
+                    makeConfigKey(patch));
             JLabel p = new JLabel(Text.titleCase(patch), JLabel.TRAILING);
             p.setForeground(Color.WHITE);
             p.setLabelFor(dropdown);
@@ -160,5 +166,9 @@ public class SeedsHelperConfig extends HelperConfig {
         SpringLayout.Constraints pCons = layout.getConstraints(parent);
         pCons.setConstraint(SpringLayout.SOUTH, y);
         pCons.setConstraint(SpringLayout.EAST, x);
+    }
+
+    private static String makeConfigKey(PatchImplementation patch) {
+        return "farmrun_seed_" + patch.name().toLowerCase();
     }
 }
