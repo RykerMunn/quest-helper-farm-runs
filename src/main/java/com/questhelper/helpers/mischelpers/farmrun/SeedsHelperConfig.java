@@ -1,4 +1,4 @@
-package com.questhelper.helpers.mischelpers.herbrun;
+package com.questhelper.helpers.mischelpers.farmrun;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -86,6 +86,8 @@ public class SeedsHelperConfig extends HelperConfig {
                 selectedPatches.size(), 2,
                 6, 6,
                 6, 6);
+
+        filtersPanel.setVisible(selectedPatches.size() > 0);
     }
 
     public void setSelectedPatches(List<PatchImplementation> selectedPatches) {

@@ -1,4 +1,4 @@
-package com.questhelper.helpers.mischelpers.herbrun;
+package com.questhelper.helpers.mischelpers.farmrun;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
