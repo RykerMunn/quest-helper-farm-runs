@@ -1,12 +1,8 @@
 package com.questhelper.panel;
 
-
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.Insets;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.DefaultListModel;
@@ -19,9 +15,7 @@ import javax.swing.JScrollPane;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionListener;
-
 import net.runelite.client.util.Text;
-
 
 public class MultiCheckBoxCombo<T> extends JPanel {
     private JButton comboButton;
@@ -30,11 +24,19 @@ public class MultiCheckBoxCombo<T> extends JPanel {
     private DefaultListModel<T> listModel;
     private List<T> selectedItems = new ArrayList<>();
     private List<ListSelectionListener> listeners = new ArrayList<>();
+    private JButton clearButton;
 
     public MultiCheckBoxCombo(List<T> items) {
         setLayout(new BorderLayout());
-        comboButton = new JButton("Select...");  // Looks like a combo box button
+        comboButton = new JButton("Select..."); // Looks like a combo box button
         add(comboButton, BorderLayout.CENTER);
+
+        // Create the clear button ("X")
+        clearButton = new JButton("X");
+        clearButton.setMargin(new Insets(2, 2, 2, 2));
+        clearButton.setFocusable(false);
+        clearButton.addActionListener(e -> clearSelection());
+        add(clearButton, BorderLayout.EAST);
 
         // Build the popup with a JList of checkboxes
         popupMenu = new JPopupMenu();
@@ -53,27 +55,25 @@ public class MultiCheckBoxCombo<T> extends JPanel {
         comboButton.addActionListener(e -> popupMenu.show(this, 0, getHeight()));
 
         // Listen for list clicks to toggle selection
-        list.addListSelectionListener(new ListSelectionListener()
-		{
-			@Override
-			public void valueChanged(javax.swing.event.ListSelectionEvent e)
-			{
-				if (!e.getValueIsAdjusting())
-				{
-					updateSelectedItems();
+        list.addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(javax.swing.event.ListSelectionEvent e) {
+                if (!e.getValueIsAdjusting()) {
+                    updateSelectedItems();
                     updateButtonText();
 
                     for (ListSelectionListener listener : listeners) {
                         listener.valueChanged(e);
                     }
-				}
-			}
-		});
+                }
+            }
+        });
     }
 
     private void updateSelectedItems() {
         selectedItems.clear();
         selectedItems.addAll(list.getSelectedValuesList());
+        clearButton.setVisible(!selectedItems.isEmpty());
     }
 
     private void updateButtonText() {
@@ -85,7 +85,7 @@ public class MultiCheckBoxCombo<T> extends JPanel {
                 if (sb.length() > 0) {
                     sb.append(", ");
                 }
-                sb.append(item instanceof Enum ? Text.titleCase((Enum)item) : item.toString());
+                sb.append(item instanceof Enum ? Text.titleCase((Enum) item) : item.toString());
             }
             comboButton.setText(sb.toString());
             comboButton.setToolTipText(sb.toString());
@@ -110,15 +110,31 @@ public class MultiCheckBoxCombo<T> extends JPanel {
     public void addListSelectionListener(ListSelectionListener listener) {
         listeners.add(listener);
     }
-    
+
+    public void clearSelection() {
+        list.clearSelection();
+        updateSelectedItems();
+        updateButtonText();
+    }
+
+    // Helper method to deselect a specific item
+    public void deselectItem(T item) {
+        int index = listModel.indexOf(item);
+        if (index != -1) {
+            list.removeSelectionInterval(index, index);
+            updateSelectedItems();
+            updateButtonText();
+        }
+    }
+
     private class CheckBoxListCellRenderer extends JCheckBox implements ListCellRenderer<T> {
         @Override
         public Component getListCellRendererComponent(JList<? extends T> list,
-                                                      T value,
-                                                      int index,
-                                                      boolean isSelected,
-                                                      boolean cellHasFocus) {
-            setText(value instanceof Enum ? Text.titleCase((Enum)value) :  value.toString());
+                T value,
+                int index,
+                boolean isSelected,
+                boolean cellHasFocus) {
+            setText(value instanceof Enum ? Text.titleCase((Enum) value) : value.toString());
             setSelected(isSelected);
             setBackground(list.getBackground());
             setForeground(list.getForeground());

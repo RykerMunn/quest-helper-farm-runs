@@ -1,4 +1,4 @@
-package com.questhelper.helpers.mischelpers.herbrun;
+package com.questhelper.helpers.mischelpers.farmrun;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -629,7 +629,7 @@ public enum QuestHelperQuest
 		QuestDetails.Difficulty.GENERIC),
 	DAG_ROUTE(new DagRouteHelper(), "Dagannoth Kings Route", QuestVarbits.QUEST_THE_FREMENNIK_ISLES, -1, QuestDetails.Type.GENERIC,
 		QuestDetails.Difficulty.GENERIC),
-	HERB_RUN(new HerbRun(), "Herb run", QuestVarbits.CUTSCENE, -1, QuestDetails.Type.GENERIC, QuestDetails.Difficulty.GENERIC),
+	FARM_RUN(new HerbRun(), "Farm run", QuestVarbits.CUTSCENE, -1, QuestDetails.Type.GENERIC, QuestDetails.Difficulty.GENERIC),
 	BARROWS_HELPER(new BarrowsHelper(), "Barrows helper", QuestVarbits.CUTSCENE, -1, QuestDetails.Type.GENERIC, QuestDetails.Difficulty.GENERIC),
 	STRONGHOLD_OF_SECURITY(new StrongholdOfSecurity(), "Stronghold of Security", QuestVarbits.STRONGHOLD_OF_SECURITY, 1,
 		QuestDetails.Type.GENERIC, QuestDetails.Difficulty.GENERIC),
