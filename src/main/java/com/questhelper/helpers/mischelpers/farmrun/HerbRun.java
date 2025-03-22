@@ -24,6 +24,9 @@
  */
 package com.questhelper.helpers.mischelpers.farmrun;
 
+import com.questhelper.questinfo.HelperConfig;
+import com.questhelper.collections.ItemCollections;
+import com.questhelper.helpers.mischelpers.farmrun.herbs.HerbRun2;
 import com.questhelper.QuestHelperConfig;
 import com.questhelper.collections.ItemCollections;
 import com.questhelper.panel.PanelDetails;
@@ -100,6 +103,8 @@ public class HerbRun extends ComplexStateQuestHelper {
 	DetailedQuestStep selectingPatchTypeStep;
 
 	SeedsHelperConfig seedsConfig;
+
+	private HerbRun2 herbRunManager;
 
 	private enum Seed {
 		GUAM(ItemID.GUAM_SEED), MARRENTILL(ItemID.MARRENTILL_SEED), TARROMIN(ItemID.TARROMIN_SEED),
