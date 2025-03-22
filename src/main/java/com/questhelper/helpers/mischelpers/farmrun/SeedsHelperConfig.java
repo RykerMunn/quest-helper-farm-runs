@@ -14,6 +14,7 @@ import javax.swing.Spring;
 import javax.swing.SpringLayout;
 
 import com.questhelper.QuestHelperConfig;
+import com.questhelper.helpers.mischelpers.farmrun.utils.PatchImplementation;
 import com.questhelper.panel.DropdownRenderer;
 import com.questhelper.questinfo.HelperConfig;
 

@@ -6,6 +6,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import com.google.inject.Singleton;
+import com.questhelper.helpers.mischelpers.farmrun.utils.PatchImplementation;
 
 import net.runelite.api.ItemID;
 

@@ -16,7 +16,7 @@
             "name": "QuestHelperPluginTest",
             "request": "launch",
             "mainClass": "com.questhelper.QuestHelperPluginTest",
-            "projectName": "quest-helper-farm-runs",
+            "projectName": "quest-helper-quest-helper-farm-runs",
             "vmArgs": "-ea",
             "args": "--debug --developer-mode"
         }
