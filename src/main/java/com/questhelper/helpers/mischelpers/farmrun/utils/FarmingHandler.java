@@ -22,10 +22,11 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.questhelper.helpers.mischelpers.farmrun;
+package com.questhelper.helpers.mischelpers.farmrun.utils;
 
 import java.time.Instant;
 import javax.annotation.Nullable;
+
 import net.runelite.api.Client;
 import net.runelite.api.Varbits;
 import net.runelite.client.config.ConfigManager;

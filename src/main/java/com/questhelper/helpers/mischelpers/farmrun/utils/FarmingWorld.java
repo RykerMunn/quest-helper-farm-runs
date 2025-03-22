@@ -23,12 +23,13 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.questhelper.helpers.mischelpers.farmrun;
+package com.questhelper.helpers.mischelpers.farmrun.utils;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.inject.Singleton;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -45,7 +46,7 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.timetracking.Tab;
 
 @Singleton
-class FarmingWorld
+public class FarmingWorld
 {
 	@SuppressWarnings("PMD.ImmutableField")
 	private Multimap<Integer, FarmingRegion> regions = HashMultimap.create();
