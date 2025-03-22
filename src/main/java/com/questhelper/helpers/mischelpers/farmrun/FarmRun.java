@@ -51,11 +51,29 @@ public abstract class FarmRun extends QuestStep {
     protected abstract PanelDetails getPanelDetails();
 
     protected void setRecommended(ItemRequirement... items) {
-        this.recommendedItems.addAll(recommendedItems);
+        this.recommendedItems.clear();
+        this.recommendedItems.addAll(Arrays.asList(items));
     }
 
     protected void setRequired(ItemRequirement... items) {
+        this.requiredItems.clear();
         this.requiredItems.addAll(Arrays.asList(items));
+    }
+
+    protected void addRecommendedItems(ItemRequirement... items) {
+        this.addRecommendedItems(Arrays.asList(items));
+    }
+
+    protected void addRecommendedItems(List<ItemRequirement> items) {
+        this.recommendedItems.addAll(items);
+    }
+
+    protected void addRequiredItems(ItemRequirement... items) {
+        this.addRequiredItems(Arrays.asList(items));
+    }
+
+    protected void addRequiredItems(List<ItemRequirement> items) {
+        this.requiredItems.addAll(items);
     }
 
     protected List<ItemRequirement> getRequiredItems() {

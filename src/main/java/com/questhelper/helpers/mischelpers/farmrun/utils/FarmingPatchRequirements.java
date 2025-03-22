@@ -1,9 +1,12 @@
 package com.questhelper.helpers.mischelpers.farmrun.utils;
 
+import java.util.List;
+
 import javax.annotation.Nullable;
 
 import com.questhelper.questhelpers.QuestHelper;
 import com.questhelper.requirements.Requirement;
+import com.questhelper.requirements.item.ItemRequirement;
 import com.questhelper.steps.QuestStep;
 
 public interface FarmingPatchRequirements {
@@ -19,4 +22,7 @@ public interface FarmingPatchRequirements {
 
     public void setPatchHarvestable(boolean isHarvestable);
     public void setPatchPlantable(boolean isPlantable);
+
+    public List<ItemRequirement> getPatchItemRecommendations();
+
 }
