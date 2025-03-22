@@ -15,11 +15,11 @@ import net.runelite.api.Skill;
 
 public class CommonPatchRequirements {
 
-    public static Requirement getArdougneCloak() {
+    public static ItemRequirement getArdougneCloak() {
         return getArdougneCloak(true);
     }
 
-    public static Requirement getArdougneCloak(boolean withAlternates) {
+    public static ItemRequirement getArdougneCloak(boolean withAlternates) {
         ItemRequirement ardougneCloak = new ItemRequirement("Ardogune Cloak", ItemID.ARDOUGNE_CLOAK_2)
                 .showConditioned(new QuestRequirement(QuestHelperQuest.ARDOUGNE_MEDIUM, QuestState.FINISHED));
         if (withAlternates) {
@@ -28,7 +28,7 @@ public class CommonPatchRequirements {
         return ardougneCloak;
     }
 
-    public static Requirement getCatherybyTeleport() {
+    public static ItemRequirements getCatherybyTeleport() {
         ItemRequirements catherbyRunes = new ItemRequirements(
                 "Runes for Catherby Teleport",
                 new ItemRequirement("Water rune", ItemID.WATER_RUNE, 10),
@@ -42,14 +42,14 @@ public class CommonPatchRequirements {
                 new ItemRequirement("Law rune", ItemID.LAW_RUNE),
                 new ItemRequirement("Air rune", ItemID.AIR_RUNE, 5));
 
-        return new ItemRequirements(LogicType.OR, catherbyRunes, catherbyTablet, camelotRunes);
+        return new ItemRequirements(LogicType.OR, "Catherby Teleport", catherbyRunes, catherbyTablet, camelotRunes);
     }
 
-    public static Requirement getExplorerRing() {
+    public static ItemRequirement getExplorerRing() {
         return getExplorerRing(true);
     }
 
-    public static Requirement getExplorerRing(boolean withAlternates) {
+    public static ItemRequirement getExplorerRing(boolean withAlternates) {
         ItemRequirement explorerRing = new ItemRequirement("Explorer's Ring", ItemID.EXPLORERS_RING_2)
                 .showConditioned(new QuestRequirement(QuestHelperQuest.LUMBRIDGE_MEDIUM, QuestState.FINISHED));
         if (withAlternates) {
@@ -58,7 +58,7 @@ public class CommonPatchRequirements {
         return explorerRing;
     }
 
-    public static Requirement getFarmingGuildTeleport() {
+    public static ItemRequirement getFarmingGuildTeleport() {
         ItemRequirement farmingGuildTeleport = new ItemRequirement(
                 "Farming guild teleport (Skills' Necklace or CIR fairy ring)",
                 ItemID.FARMING_CAPET);
@@ -70,11 +70,11 @@ public class CommonPatchRequirements {
         return farmingGuildTeleport;
     }
 
-    public static Requirement getFarmingGuildAccess() {
+    public static SkillRequirement getFarmingGuildAccess() {
         return new SkillRequirement(Skill.FARMING, 65);
     }
 
-    public static Requirement getEctophial() {
+    public static ItemRequirement getEctophial() {
         ItemRequirement ectophial = new ItemRequirement("Ectophial", ItemID.ECTOPHIAL)
                 .showConditioned(new QuestRequirement(QuestHelperQuest.GHOSTS_AHOY, QuestState.FINISHED));
 
@@ -82,8 +82,8 @@ public class CommonPatchRequirements {
         return ectophial;
     }
 
-    public static Requirement getHarmonyIslandTeleport() {
-        Requirement ectophial = getEctophial();
+    public static ItemRequirements getHarmonyIslandTeleport() {
+        ItemRequirement ectophial = getEctophial();
 
         ItemRequirement harmonyIslandRunes = new ItemRequirements(
                 "Runes for Harmony Island Teleport",
@@ -93,25 +93,25 @@ public class CommonPatchRequirements {
         ItemRequirement harmonyIslandTable = new ItemRequirement("Harmony Island teleport",
                 ItemID.HARMONY_ISLAND_TELEPORT);
 
-        return new ItemRequirements(LogicType.OR, (ItemRequirement) ectophial, harmonyIslandRunes, harmonyIslandTable);
+        return new ItemRequirements(LogicType.OR, "Harmony Island Teleport", ectophial, harmonyIslandRunes, harmonyIslandTable);
     }
 
-    public static Requirement getXericsTalisman() {
+    public static ItemRequirement getXericsTalisman() {
         return new ItemRequirement("Xeric's talisman", ItemID.XERICS_TALISMAN);
     }
 
-    public static Requirement getHosidiusTeleport() {
+    public static ItemRequirement getHosidiusTeleport() {
         ItemRequirement hosidiusHouseTeleport = new ItemRequirement("Teleport to Hosidius House",
                 ItemID.HOSIDIUS_TELEPORT);
         hosidiusHouseTeleport.addAlternates(ItemID.XERICS_TALISMAN);
         return hosidiusHouseTeleport;
     }
 
-    public static Requirement getVarlamoreAccess() {
+    public static QuestRequirement getVarlamoreAccess() {
         return new QuestRequirement(QuestHelperQuest.CHILDREN_OF_THE_SUN, QuestState.FINISHED);
     }
 
-    public static Requirement getHunterWhistle() {
+    public static ItemRequirement getHunterWhistle() {
         ItemRequirement hunterWhistle = new ItemRequirement("Quetzal whistle", ItemID.PERFECTED_QUETZAL_WHISTLE)
                 .showConditioned(getVarlamoreAccess());
         hunterWhistle.addAlternates(ItemID.BASIC_QUETZAL_WHISTLE);

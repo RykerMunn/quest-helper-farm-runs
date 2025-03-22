@@ -304,4 +304,34 @@ public enum HerbPatch implements FarmingPatchRequirements {
         public void setPatchPlantable(boolean isPlantable) {
                 empty.setShouldPass(isPlantable);
         }
+
+        public List<ItemRequirement> getPatchItemRecommendations() {
+                switch (this) {
+                        case ARDOUGNE:
+                                return List.of(CommonPatchRequirements.getArdougneCloak());
+                        case CATHERBY:
+                                return List.of(CommonPatchRequirements.getCatherybyTeleport());
+                        case FALADOR:
+                                return List.of(CommonPatchRequirements.getExplorerRing());
+                        case FARMING_GUILD:
+                                return List.of(CommonPatchRequirements.getFarmingGuildTeleport());
+                        case HARMONY:
+                                return List.of(CommonPatchRequirements.getHarmonyIslandTeleport()
+                                                .hideConditioned(new Conditions(LogicType.NOR,
+                                                                new QuestRequirement(QuestHelperQuest.MORYTANIA_ELITE,
+                                                                                QuestState.FINISHED))));
+                        case MORYTANIA:
+                                return List.of(CommonPatchRequirements.getEctophial());
+                        case TROLL_STRONGHOLD:
+                                return List.of(trollheimTeleport, stonyBasalt);
+                        case WEISS:
+                                return List.of(icyBasalt);
+                        case HOSIDIUS:
+                                return List.of(CommonPatchRequirements.getHosidiusTeleport());
+                        case VARLAMORE:
+                                return List.of(CommonPatchRequirements.getHunterWhistle());
+                        default:
+                                return List.of();
+                }
+        }
 }

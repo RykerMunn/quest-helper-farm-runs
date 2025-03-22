@@ -11,10 +11,12 @@ import com.questhelper.helpers.mischelpers.farmrun.utils.FarmingPatch;
 import com.questhelper.helpers.mischelpers.farmrun.utils.FarmingWorld;
 import com.questhelper.panel.PanelDetails;
 import com.questhelper.questhelpers.QuestHelper;
+import com.questhelper.requirements.item.ItemRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
 import com.questhelper.steps.QuestStep;
 
+import net.runelite.api.ItemID;
 import net.runelite.api.events.GameTick;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
@@ -71,6 +73,7 @@ public class HerbRun2 extends FarmRun {
             herbRunStep.addStep(patch.getPatchEmptyRequirement(), plantStep);
 
             herbRunSidebar.addSubSteps(harvestStep, plantStep);
+            addRecommendedItems(patch.getPatchItemRecommendations());
         }
         herbRunSidebar.addSubSteps(herbRunStep);
 
