@@ -1,5 +1,8 @@
 package com.questhelper.helpers.mischelpers.farmrun.herbs;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.inject.Inject;
 
 import com.questhelper.helpers.mischelpers.farmrun.utils.CommonPatchRequirements;
@@ -81,6 +84,7 @@ public enum HerbPatch implements FarmingPatchRequirements {
 
         public QuestStep getHarvestStep(QuestHelper questHelper) {
                 ObjectStep harvestStep = null;
+                List<Requirement> conditionsToHide = new ArrayList<>();
                 switch (this) {
                         case ARDOUGNE:
                                 harvestStep = new ObjectStep(
@@ -125,9 +129,10 @@ public enum HerbPatch implements FarmingPatchRequirements {
                                                 new WorldPoint(3789, 2837, 0),
                                                 "Harvest your herbs from the Harmony patch.",
                                                 CommonPatchRequirements.getHarmonyIslandTeleport());
-                                harvestStep.conditionToHideInSidebar(
-                                                new Conditions(new QuestRequirement(QuestHelperQuest.MORYTANIA_ELITE,
-                                                                QuestState.FINISHED)));
+                                conditionsToHide.add(
+                                                new Conditions(LogicType.NOR,
+                                                                new QuestRequirement(QuestHelperQuest.MORYTANIA_ELITE,
+                                                                                QuestState.FINISHED)));
                                 break;
                         case MORYTANIA:
                                 harvestStep = new ObjectStep(
@@ -143,8 +148,7 @@ public enum HerbPatch implements FarmingPatchRequirements {
                                                 new WorldPoint(3605, 3529, 0),
                                                 "Harvest your herbs from the Troll Stronghold patch.",
                                                 trollheimTeleport, stonyBasalt);
-                                harvestStep.conditionToHideInSidebar(
-                                                new Conditions(LogicType.NOR, accessToTrollStronghold));
+                                conditionsToHide.add(new Conditions(LogicType.NOR, accessToTrollStronghold));
                                 break;
                         case WEISS:
                                 harvestStep = new ObjectStep(
@@ -153,7 +157,7 @@ public enum HerbPatch implements FarmingPatchRequirements {
                                                 new WorldPoint(2848, 3934, 0),
                                                 "Harvest your herbs from the Weiss patch.",
                                                 icyBasalt);
-                                harvestStep.conditionToHideInSidebar(new Conditions(LogicType.NOR, accessToWeiss));
+                                conditionsToHide.add(new Conditions(LogicType.NOR, accessToWeiss));
                                 break;
                         case HOSIDIUS:
                                 harvestStep = new ObjectStep(
@@ -170,7 +174,7 @@ public enum HerbPatch implements FarmingPatchRequirements {
                                                 new WorldPoint(1582, 3094, 0),
                                                 "Harvest your herbs from the Varlamore patch.",
                                                 CommonPatchRequirements.getHunterWhistle());
-                                harvestStep.conditionToHideInSidebar(
+                                conditionsToHide.add(
                                                 new Conditions(LogicType.NOR,
                                                                 CommonPatchRequirements.getVarlamoreAccess()));
 
@@ -178,106 +182,119 @@ public enum HerbPatch implements FarmingPatchRequirements {
                         default:
                                 return null;
                 }
+                conditionsToHide.add(new Conditions(LogicType.NOR, getPatchReadyRequirement()));
+                harvestStep.conditionToHideInSidebar(
+                                new Conditions(LogicType.OR, conditionsToHide));
                 harvestStep.addSubSteps(getPlantStep(questHelper));
                 return harvestStep;
         }
 
         public QuestStep getPlantStep(QuestHelper questHelper) {
+                QuestStep plantStep = null;
+                List<Requirement> conditionsToHide = new ArrayList<>();
                 switch (this) {
                         case ARDOUGNE:
-                                return new ObjectStep(
+                                plantStep = new ObjectStep(
                                                 questHelper,
                                                 NullObjectID.NULL_8152,
                                                 new WorldPoint(2670, 3374, 0),
                                                 "Plant your seeds into the Ardougne patch.",
-                                                CommonPatchRequirements.getArdougneCloak()).addIcon(ItemID.RANARR_SEED);
+                                                CommonPatchRequirements.getArdougneCloak());
+                                break;
                         case CATHERBY:
-                                return new ObjectStep(
+                                plantStep = new ObjectStep(
                                                 questHelper,
                                                 NullObjectID.NULL_8151,
                                                 new WorldPoint(2813, 3463, 0),
                                                 "Plant your seeds into the Catherby patch.",
-                                                CommonPatchRequirements.getCatherybyTeleport())
-                                                .addIcon(ItemID.RANARR_SEED);
+                                                CommonPatchRequirements.getCatherybyTeleport());
+                                break;
                         case FALADOR:
-                                return new ObjectStep(
+                                plantStep = new ObjectStep(
                                                 questHelper,
                                                 NullObjectID.NULL_8150,
                                                 new WorldPoint(3058, 3311, 0),
                                                 "Plant your seeds into the Faladar patch.",
-                                                CommonPatchRequirements.getExplorerRing()).addIcon(ItemID.RANARR_SEED);
+                                                CommonPatchRequirements.getExplorerRing());
+                                break;
                         case FARMING_GUILD:
-                                QuestStep farmingGuildPlant = new ObjectStep(
+                                plantStep = new ObjectStep(
                                                 questHelper,
                                                 NullObjectID.NULL_33979,
                                                 new WorldPoint(1238, 3726, 0),
                                                 "Plant your seeds into the Farming Guild patch.",
                                                 CommonPatchRequirements.getFarmingGuildTeleport());
-                                farmingGuildPlant.conditionToHideInSidebar(
+                                conditionsToHide.add(
                                                 new Conditions(LogicType.NOR,
                                                                 CommonPatchRequirements.getFarmingGuildAccess()));
-                                farmingGuildPlant.addIcon(ItemID.RANARR_SEED);
-                                return farmingGuildPlant;
+                                break;
                         case HARMONY:
-                                ObjectStep harmonyPlant = new ObjectStep(
+                                plantStep = new ObjectStep(
                                                 questHelper,
                                                 NullObjectID.NULL_8153,
                                                 new WorldPoint(3789, 2837, 0),
                                                 "Plant your seeds into the Harmony patch.",
                                                 CommonPatchRequirements.getHarmonyIslandTeleport());
-                                harmonyPlant.conditionToHideInSidebar(
-                                                new Conditions(new QuestRequirement(QuestHelperQuest.MORYTANIA_ELITE,
-                                                                QuestState.FINISHED)));
-                                harmonyPlant.addIcon(ItemID.RANARR_SEED);
-                                return harmonyPlant;
+                                conditionsToHide.add(
+                                                new Conditions(LogicType.NOR,
+                                                                new QuestRequirement(QuestHelperQuest.MORYTANIA_ELITE,
+                                                                                QuestState.FINISHED)));
+                                break;
+
                         case MORYTANIA:
-                                return new ObjectStep(
+                                plantStep = new ObjectStep(
                                                 questHelper,
                                                 NullObjectID.NULL_8153,
                                                 new WorldPoint(3605, 3529, 0),
                                                 "Plant your seeds into the Morytania patch.",
-                                                CommonPatchRequirements.getEctophial()).addIcon(ItemID.RANARR_SEED);
+                                                CommonPatchRequirements.getEctophial());
+                                break;
                         case TROLL_STRONGHOLD:
-                                ObjectStep trollStrongholdPlant = new ObjectStep(
+                                plantStep = new ObjectStep(
                                                 questHelper,
                                                 NullObjectID.NULL_18816,
                                                 new WorldPoint(3605, 3529, 0),
                                                 "Plant your seeds into the Troll Stronghold patch.",
                                                 trollheimTeleport, stonyBasalt);
-                                trollStrongholdPlant.conditionToHideInSidebar(
+                                conditionsToHide.add(
                                                 new Conditions(LogicType.NOR, accessToTrollStronghold));
-                                return trollStrongholdPlant.addIcon(ItemID.RANARR_SEED);
+                                break;
                         case WEISS:
-                                ObjectStep weissPlant = new ObjectStep(
+                                plantStep = new ObjectStep(
                                                 questHelper,
                                                 NullObjectID.NULL_33176,
                                                 new WorldPoint(2848, 3934, 0),
                                                 "Plant your seeds into the Weiss patch.",
                                                 icyBasalt);
-                                weissPlant.conditionToHideInSidebar(new Conditions(LogicType.NOR, accessToWeiss));
-                                return weissPlant.addIcon(ItemID.RANARR_SEED);
+                                conditionsToHide.add(new Conditions(LogicType.NOR, accessToWeiss));
+                                break;
                         case HOSIDIUS:
-                                return new ObjectStep(
+                                plantStep = new ObjectStep(
                                                 questHelper,
                                                 NullObjectID.NULL_27115,
                                                 new WorldPoint(1738, 3550, 0),
                                                 "Plant your seeds into the Hosidius patch.",
-                                                CommonPatchRequirements.getHosidiusTeleport())
-                                                .addIcon(ItemID.RANARR_SEED);
+                                                CommonPatchRequirements.getHosidiusTeleport());
+                                break;
                         case VARLAMORE:
-                                ObjectStep varlamorePlant = new ObjectStep(
+                                plantStep = new ObjectStep(
                                                 questHelper,
                                                 NullObjectID.NULL_50697,
                                                 new WorldPoint(1582, 3094, 0),
                                                 "Plant your seeds into the Varlamore patch.",
                                                 CommonPatchRequirements.getHunterWhistle());
-                                varlamorePlant.conditionToHideInSidebar(
+                                conditionsToHide.add(
                                                 new Conditions(LogicType.NOR,
                                                                 CommonPatchRequirements.getVarlamoreAccess()));
-                                return varlamorePlant.addIcon(ItemID.RANARR_SEED);
+                                break;
                         default:
                                 return null;
                 }
+                plantStep.addIcon(ItemID.RANARR_SEED);
+                conditionsToHide.add(new Conditions(LogicType.NOR, getPatchEmptyRequirement()));
+                plantStep.conditionToHideInSidebar(
+                                new Conditions(LogicType.OR, conditionsToHide));
+                return plantStep;
         }
 
         public void setPatchHarvestable(boolean isHarvestable) {
