@@ -137,9 +137,6 @@ public class HerbRun extends ComplexStateQuestHelper {
 
 	@Override
 	public QuestStep loadStep() {
-		farmingHandler = new FarmingHandler(client, configManager);
-		herbRunManager = new HerbRun2(this, farmingWorld, farmingHandler);
-		eventBus.register(herbRunManager);
 		initializeRequirements();
 		setupConditions();
 		setupSteps();
@@ -577,6 +574,9 @@ public class HerbRun extends ComplexStateQuestHelper {
 
 	@Override
 	public void startUp(QuestHelperConfig helperConfig) {
+		farmingHandler = new FarmingHandler(client, configManager);
+		herbRunManager = new HerbRun2(this, farmingWorld, farmingHandler);
+		eventBus.register(herbRunManager);
 		step = loadStep();
 		this.config = helperConfig;
 		instantiateSteps(Collections.singletonList(step));
@@ -590,6 +590,7 @@ public class HerbRun extends ComplexStateQuestHelper {
 			selectedPatches.addAll(parsePatchImplementations(patchSelectionTest));
 			bPatchesSelected = selectedPatches.size() > 0;
 		}
+
 		startUpStep(step);
 	}
 
