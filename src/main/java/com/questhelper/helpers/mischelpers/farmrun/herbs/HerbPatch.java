@@ -68,6 +68,10 @@ public enum HerbPatch implements FarmingPatchRequirements {
         HerbPatch(ManualRequirement emptyRequirement, ManualRequirement ready) {
                 this.empty = emptyRequirement;
                 this.ready = ready;
+
+                trollheimTeleport.setTooltip(
+                                "Trollheim teleport runes, tablet, or stony basalt (with Making Friends with My Arm)");
+                trollheimTeleport.setQuantity(1);
         }
 
         public final Requirement getPatchEmptyRequirement() {

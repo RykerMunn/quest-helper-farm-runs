@@ -20,11 +20,13 @@ public class CommonPatchRequirements {
     }
 
     public static ItemRequirement getArdougneCloak(boolean withAlternates) {
-        ItemRequirement ardougneCloak = new ItemRequirement("Ardogune Cloak", ItemID.ARDOUGNE_CLOAK_2)
+        ItemRequirement ardougneCloak = new ItemRequirement("Ardogune Cloak 2+", ItemID.ARDOUGNE_CLOAK_2)
                 .showConditioned(new QuestRequirement(QuestHelperQuest.ARDOUGNE_MEDIUM, QuestState.FINISHED));
         if (withAlternates) {
             ardougneCloak.addAlternates(ItemID.ARDOUGNE_CLOAK_3, ItemID.ARDOUGNE_CLOAK_4);
         }
+
+        ardougneCloak.setTooltip(null);
         return ardougneCloak;
     }
 
@@ -35,14 +37,26 @@ public class CommonPatchRequirements {
                 new ItemRequirement("Law rune", ItemID.LAW_RUNE, 3),
                 new ItemRequirement("Astral rune", ItemID.ASTRAL_RUNE, 3));
 
-        ItemRequirement catherbyTablet = new ItemRequirement("Catherby tablet", ItemID.CATHERBY_TELEPORT);
+        catherbyRunes.showConditioned(new SkillRequirement(Skill.MAGIC, 87));
+        catherbyRunes.showConditioned(new QuestRequirement(QuestHelperQuest.LUNAR_DIPLOMACY, QuestState.FINISHED));
 
+        ItemRequirement catherbyTablet = new ItemRequirement("Catherby tablet", ItemID.CATHERBY_TELEPORT);
         ItemRequirement camelotRunes = new ItemRequirements(
                 "Runes for Camelot Teleport",
                 new ItemRequirement("Law rune", ItemID.LAW_RUNE),
                 new ItemRequirement("Air rune", ItemID.AIR_RUNE, 5));
 
-        return new ItemRequirements(LogicType.OR, "Catherby Teleport", catherbyRunes, catherbyTablet, camelotRunes);
+        ItemRequirement camelotTablet = new ItemRequirement("Camelot teleport", ItemID.CAMELOT_TELEPORT);
+        camelotRunes.showConditioned(new SkillRequirement(Skill.MAGIC, 45));
+
+        ItemRequirements catherybyTeleport = new ItemRequirements(LogicType.OR, "Catherby Teleport", catherbyRunes,
+                catherbyTablet, camelotRunes, camelotTablet);
+
+        catherybyTeleport.setTooltip(
+                "Lunar Spellbook (Lvl 87 Magic) or Catherby teleport tablet. Camelot teleport is an alternative.");
+        catherybyTeleport.setQuantity(1);
+        catherybyTeleport.setDisplayMatchedItemName(true);
+        return catherybyTeleport;
     }
 
     public static ItemRequirement getExplorerRing() {
@@ -79,6 +93,7 @@ public class CommonPatchRequirements {
                 .showConditioned(new QuestRequirement(QuestHelperQuest.GHOSTS_AHOY, QuestState.FINISHED));
 
         ectophial.addAlternates(ItemID.ECTOPHIAL_4252);
+        ectophial.setTooltip(null);
         return ectophial;
     }
 
@@ -90,10 +105,17 @@ public class CommonPatchRequirements {
                 new ItemRequirement("Nature rune", ItemID.NATURE_RUNE, 1),
                 new ItemRequirement("Law rune", ItemID.LAW_RUNE, 1),
                 new ItemRequirement("Soul rune", ItemID.SOUL_RUNE, 1));
+        harmonyIslandRunes.showConditioned(new SkillRequirement(Skill.MAGIC, 65));
+        
         ItemRequirement harmonyIslandTable = new ItemRequirement("Harmony Island teleport",
                 ItemID.HARMONY_ISLAND_TELEPORT);
 
-        return new ItemRequirements(LogicType.OR, "Harmony Island Teleport", ectophial, harmonyIslandRunes, harmonyIslandTable);
+        ItemRequirements harmonyTeleport = new ItemRequirements(LogicType.OR, "Harmony Island Teleport", ectophial,
+                harmonyIslandRunes, harmonyIslandTable);
+
+        harmonyTeleport.setTooltip("Arceuus Spellbok (Lvl 65 Magic) or Harmony Island teleport tablet.");
+
+        return harmonyTeleport;
     }
 
     public static ItemRequirement getXericsTalisman() {
@@ -101,7 +123,7 @@ public class CommonPatchRequirements {
     }
 
     public static ItemRequirement getHosidiusTeleport() {
-        ItemRequirement hosidiusHouseTeleport = new ItemRequirement("Teleport to Hosidius House",
+        ItemRequirement hosidiusHouseTeleport = new ItemRequirement("Teleport to Hosidius House (Tablet or Xeric's Talisman)",
                 ItemID.HOSIDIUS_TELEPORT);
         hosidiusHouseTeleport.addAlternates(ItemID.XERICS_TALISMAN);
         return hosidiusHouseTeleport;
