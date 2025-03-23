@@ -15,7 +15,6 @@ import com.questhelper.requirements.var.VarbitRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.QuestStep;
 
-import net.runelite.api.Client;
 import net.runelite.api.ItemID;
 import net.runelite.api.Varbits;
 import net.runelite.api.events.GameTick;
@@ -31,11 +30,11 @@ public abstract class AbstractFarmRun extends QuestStep {
     private final Comparator<ItemRequirement> itemRequirementComparator = Comparator
             .comparing(ItemRequirement::getName);
 
-    public AbstractFarmRun(Client client, QuestHelper questHelper, FarmingWorld farmingWorld, FarmingHandler farmingHandler) {
+    public AbstractFarmRun(QuestHelper questHelper, FarmingWorld farmingWorld, FarmingHandler farmingHandler) {
         super(questHelper);
         this.farmingWorld = farmingWorld;
         this.farmingHandler = farmingHandler;
-        this.client = client;
+        this.client = questHelper.getQuestHelperPlugin().getClient();
         this.clientThread = questHelper.getQuestHelperPlugin().getClientThread();
         requiredItems = new HashSet<>();
         recommendedItems = new HashSet<>();

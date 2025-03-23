@@ -5,6 +5,7 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ItemEvent;
+import java.util.Collection;
 import java.util.List;
 
 import javax.swing.JComboBox;
@@ -24,11 +25,11 @@ import net.runelite.client.util.Text;
 
 public class SeedsHelperConfig extends HelperConfig {
 
-    private List<PatchImplementation> selectedPatches;
+    private Collection<PatchImplementation> selectedPatches;
     private final JPanel filtersPanel = new JPanel(new SpringLayout());
     private FarmingSeedFactory farmingSeedFactory;
 
-    public SeedsHelperConfig(FarmingSeedFactory seedFactory, String name, List<PatchImplementation> selectedPatches) {
+    public SeedsHelperConfig(FarmingSeedFactory seedFactory, String name, Collection<PatchImplementation> selectedPatches) {
         // empty key and null enum as customRender implements using PatchImplementation
         super(name, "", null);
         this.farmingSeedFactory = seedFactory;
