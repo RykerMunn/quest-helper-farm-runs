@@ -109,15 +109,12 @@ public class HerbRun extends ComplexStateQuestHelper {
 
 	private AbstractFarmRun herbRunManager;
 
-
-
 	private enum GracefulOrFarming {
 		NONE(),
 		GRACEFUL(),
 		FARMING();
 	}
 
-	
 	private final String GRACEFUL_OR_FARMING = "gracefulOrFarming";
 	private final String PATCH_SELECTION = "patchSelection";
 
@@ -536,6 +533,7 @@ public class HerbRun extends ComplexStateQuestHelper {
 	public void startUp(QuestHelperConfig helperConfig) {
 		farmingHandler = new FarmingHandler(client, configManager);
 		herbRunManager = new HerbRun2(client, this, farmingWorld, farmingHandler);
+
 		eventBus.register(herbRunManager);
 		step = loadStep();
 		this.config = helperConfig;

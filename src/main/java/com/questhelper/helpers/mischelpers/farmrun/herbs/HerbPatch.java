@@ -3,12 +3,8 @@ package com.questhelper.helpers.mischelpers.farmrun.herbs;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
-
 import com.questhelper.helpers.mischelpers.farmrun.utils.CommonPatchRequirements;
-import com.questhelper.helpers.mischelpers.farmrun.utils.FarmingHandler;
 import com.questhelper.helpers.mischelpers.farmrun.utils.FarmingPatchRequirements;
-import com.questhelper.helpers.mischelpers.farmrun.utils.FarmingWorld;
 import com.questhelper.questhelpers.QuestHelper;
 import com.questhelper.questinfo.QuestHelperQuest;
 import com.questhelper.requirements.ManualRequirement;
