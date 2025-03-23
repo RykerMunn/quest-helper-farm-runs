@@ -25,4 +25,7 @@ public interface FarmingPatchRequirements {
 
     public List<ItemRequirement> getPatchItemRecommendations();
 
+    @Nullable
+    public Requirement getConditionsToHideRequirement();
+
 }

@@ -1,9 +1,11 @@
 package com.questhelper.helpers.mischelpers.farmrun;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 
+import com.questhelper.collections.ItemCollections;
 import com.questhelper.helpers.mischelpers.farmrun.utils.FarmingHandler;
 import com.questhelper.helpers.mischelpers.farmrun.utils.FarmingWorld;
 import com.questhelper.panel.PanelDetails;
@@ -13,27 +15,38 @@ import com.questhelper.requirements.var.VarbitRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.QuestStep;
 
+import net.runelite.api.Client;
 import net.runelite.api.ItemID;
 import net.runelite.api.Varbits;
+import net.runelite.api.events.GameTick;
+import net.runelite.client.events.ConfigChanged;
 
-public abstract class FarmRun extends QuestStep {
+public abstract class AbstractFarmRun extends QuestStep {
 
-    HashSet<ItemRequirement> recommendedItems;
-    HashSet<ItemRequirement> requiredItems;
+    private HashSet<ItemRequirement> recommendedItems;
+    private HashSet<ItemRequirement> requiredItems;
 
-    public FarmRun(QuestHelper questHelper, FarmingWorld farmingWorld, FarmingHandler farmingHandler) {
+    private ItemRequirement compostItemRequirement = new ItemRequirement("Compost", ItemCollections.COMPOST);
+
+    private final Comparator<ItemRequirement> itemRequirementComparator = Comparator
+            .comparing(ItemRequirement::getName);
+
+    public AbstractFarmRun(Client client, QuestHelper questHelper, FarmingWorld farmingWorld, FarmingHandler farmingHandler) {
         super(questHelper);
         this.farmingWorld = farmingWorld;
         this.farmingHandler = farmingHandler;
+        this.client = client;
         requiredItems = new HashSet<>();
         recommendedItems = new HashSet<>();
-
+        compostItemRequirement.setDisplayMatchedItemName(true);
         requiredItems.add(new ItemRequirement("Seed dibber", ItemID.SEED_DIBBER));
         requiredItems.add(new ItemRequirement("Spade", ItemID.SPADE));
         requiredItems.add(new ItemRequirement("Rake", ItemID.RAKE)
                 .hideConditioned(new VarbitRequirement(Varbits.AUTOWEED, 2)));
+        requiredItems.add(compostItemRequirement);
 
         recommendedItems.add(new ItemRequirement("Magic secateurs", ItemID.MAGIC_SECATEURS));
+
     }
 
     protected FarmingWorld farmingWorld;
@@ -49,6 +62,10 @@ public abstract class FarmRun extends QuestStep {
     protected abstract void addSteps();
 
     protected abstract PanelDetails getPanelDetails();
+
+    protected abstract void onGameTick(GameTick event);
+
+    protected abstract void onConfigChanged(ConfigChanged event);
 
     protected void setRecommended(ItemRequirement... items) {
         this.recommendedItems.clear();
@@ -77,10 +94,18 @@ public abstract class FarmRun extends QuestStep {
     }
 
     protected List<ItemRequirement> getRequiredItems() {
-        return Arrays.asList(requiredItems.toArray(ItemRequirement[]::new));
+        List<ItemRequirement> items = Arrays.asList(requiredItems.toArray(ItemRequirement[]::new));
+        items.sort(itemRequirementComparator);
+        return items;
     }
 
     protected List<ItemRequirement> getRecommendedItems() {
-        return Arrays.asList(recommendedItems.toArray(ItemRequirement[]::new));
+        List<ItemRequirement> items = Arrays.asList(recommendedItems.toArray(ItemRequirement[]::new));
+        items.sort(itemRequirementComparator);
+        return items;
+    }
+
+    protected void setRequiredCompostQuantity(int quantity) {
+        compostItemRequirement.setQuantity(quantity);
     }
 }

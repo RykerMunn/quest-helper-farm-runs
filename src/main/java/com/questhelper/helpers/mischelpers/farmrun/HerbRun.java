@@ -111,23 +111,9 @@ public class HerbRun extends ComplexStateQuestHelper {
 
 	SeedsHelperConfig seedsConfig;
 
-	private FarmRun herbRunManager;
+	private AbstractFarmRun herbRunManager;
 
-	private enum Seed {
-		GUAM(ItemID.GUAM_SEED), MARRENTILL(ItemID.MARRENTILL_SEED), TARROMIN(ItemID.TARROMIN_SEED),
-		HARRALANDER(ItemID.HARRALANDER_SEED),
-		RANARR(ItemID.RANARR_SEED), TOADFLAX(ItemID.TOADFLAX_SEED), IRIT(ItemID.IRIT_SEED),
-		AVANTOE(ItemID.AVANTOE_SEED), KWUARM(ItemID.KWUARM_SEED),
-		SNAPDRAGON(ItemID.SNAPDRAGON_SEED), HUASCA(ItemID.HUASCA_SEED), CADANTINE(ItemID.CADANTINE_SEED),
-		LATANDYME(ItemID.LANTADYME_SEED),
-		DWARF_WEED(ItemID.DWARF_WEED_SEED), TORSTOL(ItemID.TORSTOL_SEED);
 
-		final int seedID;
-
-		Seed(int seedID) {
-			this.seedID = seedID;
-		}
-	}
 
 	private enum GracefulOrFarming {
 		NONE(),
@@ -135,7 +121,7 @@ public class HerbRun extends ComplexStateQuestHelper {
 		FARMING();
 	}
 
-	private final String HERB_SEEDS = "herbSeeds";
+	
 	private final String GRACEFUL_OR_FARMING = "gracefulOrFarming";
 	private final String PATCH_SELECTION = "patchSelection";
 
@@ -245,21 +231,6 @@ public class HerbRun extends ComplexStateQuestHelper {
 		// rake = new ItemRequirement("Rake", ItemID.RAKE).hideConditioned(new
 		// VarbitRequirement(Varbits.AUTOWEED, 2));
 
-		// seed = new ItemRequirement("Seeds of your choice", ItemID.GUAM_SEED);
-
-		String seedName = configManager.getRSProfileConfiguration(QuestHelperConfig.QUEST_BACKGROUND_GROUP, HERB_SEEDS);
-
-		if (seedName != null) {
-			try {
-				seed.setId(Seed.valueOf(seedName).seedID);
-			} catch (IllegalArgumentException err) {
-				configManager.setRSProfileConfiguration(QuestHelperConfig.QUEST_BACKGROUND_GROUP, HERB_SEEDS,
-						Seed.GUAM);
-			}
-			seed.setName(Text.titleCase(Seed.valueOf(seedName)) + " seed");
-		} else {
-			configManager.setConfiguration(QuestHelperConfig.QUEST_BACKGROUND_GROUP, HERB_SEEDS, Seed.GUAM);
-		}
 		// compost = new ItemRequirement("Compost", ItemCollections.COMPOST);
 		// compost.setDisplayMatchedItemName(true);
 		// ectophial = new ItemRequirement("Ectophial", ItemID.ECTOPHIAL)
@@ -461,17 +432,6 @@ public class HerbRun extends ComplexStateQuestHelper {
 			return;
 		}
 
-		if (event.getKey().equals(HERB_SEEDS)) {
-			try {
-				Seed selectedSeed = Seed.valueOf(event.getNewValue());
-				seed.setId(selectedSeed.seedID);
-				seed.setName(Text.titleCase(selectedSeed) + " seed");
-				questHelperPlugin.refreshBank();
-			} catch (IllegalArgumentException err) {
-				questHelperPlugin.getConfigManager().setConfiguration(QuestHelperConfig.QUEST_BACKGROUND_GROUP,
-						HERB_SEEDS, Seed.GUAM);
-			}
-		}
 		if (event.getKey().equals(GRACEFUL_OR_FARMING)) {
 			questHelperPlugin.refreshBank();
 		}
@@ -528,7 +488,7 @@ public class HerbRun extends ComplexStateQuestHelper {
 	@Override
 	public void startUp(QuestHelperConfig helperConfig) {
 		farmingHandler = new FarmingHandler(client, configManager);
-		herbRunManager = new HerbRun2(this, farmingWorld, farmingHandler);
+		herbRunManager = new HerbRun2(client, this, farmingWorld, farmingHandler);
 		eventBus.register(herbRunManager);
 		step = loadStep();
 		this.config = helperConfig;
