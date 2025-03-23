@@ -36,6 +36,7 @@ public abstract class AbstractFarmRun extends QuestStep {
         this.farmingWorld = farmingWorld;
         this.farmingHandler = farmingHandler;
         this.client = client;
+        this.clientThread = questHelper.getQuestHelperPlugin().getClientThread();
         requiredItems = new HashSet<>();
         recommendedItems = new HashSet<>();
         compostItemRequirement.setDisplayMatchedItemName(true);
@@ -106,6 +107,6 @@ public abstract class AbstractFarmRun extends QuestStep {
     }
 
     protected void setRequiredCompostQuantity(int quantity) {
-        compostItemRequirement.setQuantity(quantity);
+        compostItemRequirement.quantity(quantity);
     }
 }

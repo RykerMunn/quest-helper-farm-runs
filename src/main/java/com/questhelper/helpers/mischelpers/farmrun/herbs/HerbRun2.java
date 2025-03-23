@@ -1,27 +1,28 @@
 package com.questhelper.helpers.mischelpers.farmrun.herbs;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
-
-import javax.inject.Inject;
 
 import com.questhelper.QuestHelperConfig;
 import com.questhelper.helpers.mischelpers.farmrun.AbstractFarmRun;
 import com.questhelper.helpers.mischelpers.farmrun.utils.FarmingHandler;
 import com.questhelper.helpers.mischelpers.farmrun.utils.FarmingPatch;
 import com.questhelper.helpers.mischelpers.farmrun.utils.FarmingWorld;
+import com.questhelper.managers.ItemAndLastUpdated;
+import com.questhelper.managers.QuestContainerManager;
 import com.questhelper.panel.PanelDetails;
 import com.questhelper.questhelpers.QuestHelper;
 import com.questhelper.requirements.Requirement;
+import com.questhelper.requirements.conditional.Conditions;
 import com.questhelper.requirements.item.ItemRequirement;
+import com.questhelper.requirements.util.LogicType;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
-import com.questhelper.steps.QuestStep;
 
 import net.runelite.api.Client;
 import net.runelite.api.ItemID;
 import net.runelite.api.events.GameTick;
-import net.runelite.client.eventbus.EventBus;
+import net.runelite.client.callback.ClientThread;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.timetracking.Tab;
@@ -37,10 +38,11 @@ public class HerbRun2 extends AbstractFarmRun {
     private DetailedQuestStep waitForHerbsToGrow;
     private ConditionalStep herbRunStep;
 
-    private QuestStep herbRunSidebar;
     private PanelDetails herbRunDetails;
 
     private ItemRequirement seedItemRequirement;
+
+    private List<Requirement> patchRequirements;
 
     private enum HerbSeed {
         GUAM(ItemID.GUAM_SEED), MARRENTILL(ItemID.MARRENTILL_SEED), TARROMIN(ItemID.TARROMIN_SEED),
@@ -58,10 +60,12 @@ public class HerbRun2 extends AbstractFarmRun {
         }
     }
 
-    private final String HERB_SEEDS = "herbSeeds";
+    private final String HERB_SEEDS = "farmrun_seed_herb";
 
-    public HerbRun2(Client client, QuestHelper questHelper, FarmingWorld farmingWorld, FarmingHandler farmingHandler) {
+    public HerbRun2(Client client, QuestHelper questHelper, FarmingWorld farmingWorld,
+            FarmingHandler farmingHandler) {
         super(client, questHelper, farmingWorld, farmingHandler);
+        this.patchRequirements = new ArrayList<>();
     }
 
     @Override
@@ -84,6 +88,7 @@ public class HerbRun2 extends AbstractFarmRun {
             try {
                 seedItemRequirement.setId(HerbSeed.valueOf(seedName).seedID);
             } catch (IllegalArgumentException err) {
+                seedName = HerbSeed.GUAM.name();
                 configManager.setRSProfileConfiguration(QuestHelperConfig.QUEST_BACKGROUND_GROUP, HERB_SEEDS,
                         HerbSeed.GUAM);
             }
@@ -98,27 +103,28 @@ public class HerbRun2 extends AbstractFarmRun {
     @Override
     protected void setupSteps() {
         waitForHerbsToGrow = new DetailedQuestStep(questHelper, "Wait for your herbs to grow.");
+
         // conditional step to group everything.
         herbRunStep = new ConditionalStep(questHelper, waitForHerbsToGrow);
     }
 
     @Override
     protected void addSteps() {
-        herbRunSidebar = new DetailedQuestStep(questHelper, "Complete your herb run.");
         for (HerbPatch patch : patches) {
             var ready = patch.getPatchReadyRequirement();
             var harvestStep = patch.getHarvestStep(questHelper);
             if (harvestStep == null)
                 continue;
+
             herbRunStep.addStep(ready, harvestStep);
             var plantStep = patch.getPlantStep(questHelper);
             herbRunStep.addStep(patch.getPatchEmptyRequirement(), plantStep);
-
-            herbRunSidebar.addSubSteps(harvestStep, plantStep);
             addRecommendedItems(patch.getPatchItemRecommendations());
-        }
-        herbRunSidebar.addSubSteps(herbRunStep);
 
+            patchRequirements.add(ready);
+            patchRequirements.add(patch.getPatchEmptyRequirement());
+        }
+        waitForHerbsToGrow.conditionToHideInSidebar(new Conditions(LogicType.OR, patchRequirements));
     }
 
     @Override
@@ -171,12 +177,19 @@ public class HerbRun2 extends AbstractFarmRun {
 
     @Subscribe
     public void onConfigChanged(ConfigChanged event) {
-        if (event.getGroup().equals(QuestHelperConfig.QUEST_BACKGROUND_GROUP) && event.getKey().equals(HERB_SEEDS)) {
+        if (!event.getGroup().equals(QuestHelperConfig.QUEST_BACKGROUND_GROUP))
+            return;
+        if (event.getKey().equals(HERB_SEEDS)) {
             try {
                 HerbSeed selectedSeed = HerbSeed.valueOf(event.getNewValue());
                 seedItemRequirement.setId(selectedSeed.seedID);
                 seedItemRequirement.setName(Text.titleCase(selectedSeed) + " seed");
                 questHelper.getQuestHelperPlugin().refreshBank();
+                questHelper.getQuestHelperPlugin().getClientThread().invokeLater(() -> {
+                    // force the inventory requirements to update.
+                    ItemAndLastUpdated inventoryData = QuestContainerManager.getInventoryData();
+                    inventoryData.update(inventoryData.getLastUpdated() + 1, inventoryData.getItems());
+                });
             } catch (IllegalArgumentException err) {
                 questHelper.getConfigManager().setConfiguration(QuestHelperConfig.QUEST_BACKGROUND_GROUP,
                         HERB_SEEDS, HerbSeed.GUAM);

@@ -58,7 +58,7 @@ public class SeedsHelperConfig extends HelperConfig {
                 FarmingSeed source = (FarmingSeed) e.getItem();
                 configManager.setRSProfileConfiguration(QuestHelperConfig.QUEST_BACKGROUND_GROUP,
                         key,
-                        source);
+                        source.getSeedName());
             }
         });
         String currentVal = configManager.getRSProfileConfiguration(QuestHelperConfig.QUEST_BACKGROUND_GROUP, key);
