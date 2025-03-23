@@ -118,9 +118,7 @@ public enum HerbPatch implements FarmingPatchRequirements {
                                                 "Harvest your herbs from the Farming Guild patch.",
                                                 CommonPatchRequirements.getFarmingGuildTeleport());
 
-                                harvestStep.conditionToHideInSidebar(
-                                                CommonPatchRequirements.getFarmingGuildAccess());
-
+                                conditionsToHide.add(getConditionsToHideRequirement());
                                 break;
                         case HARMONY:
                                 harvestStep = new ObjectStep(
@@ -129,10 +127,7 @@ public enum HerbPatch implements FarmingPatchRequirements {
                                                 new WorldPoint(3789, 2837, 0),
                                                 "Harvest your herbs from the Harmony patch.",
                                                 CommonPatchRequirements.getHarmonyIslandTeleport());
-                                conditionsToHide.add(
-                                                new Conditions(LogicType.NOR,
-                                                                new QuestRequirement(QuestHelperQuest.MORYTANIA_ELITE,
-                                                                                QuestState.FINISHED)));
+                                conditionsToHide.add(getConditionsToHideRequirement());
                                 break;
                         case MORYTANIA:
                                 harvestStep = new ObjectStep(
@@ -148,7 +143,7 @@ public enum HerbPatch implements FarmingPatchRequirements {
                                                 new WorldPoint(3605, 3529, 0),
                                                 "Harvest your herbs from the Troll Stronghold patch.",
                                                 trollheimTeleport, stonyBasalt);
-                                conditionsToHide.add(new Conditions(LogicType.NOR, accessToTrollStronghold));
+                                conditionsToHide.add(getConditionsToHideRequirement());
                                 break;
                         case WEISS:
                                 harvestStep = new ObjectStep(
@@ -157,7 +152,7 @@ public enum HerbPatch implements FarmingPatchRequirements {
                                                 new WorldPoint(2848, 3934, 0),
                                                 "Harvest your herbs from the Weiss patch.",
                                                 icyBasalt);
-                                conditionsToHide.add(new Conditions(LogicType.NOR, accessToWeiss));
+                                conditionsToHide.add(getConditionsToHideRequirement());
                                 break;
                         case HOSIDIUS:
                                 harvestStep = new ObjectStep(
@@ -174,15 +169,14 @@ public enum HerbPatch implements FarmingPatchRequirements {
                                                 new WorldPoint(1582, 3094, 0),
                                                 "Harvest your herbs from the Varlamore patch.",
                                                 CommonPatchRequirements.getHunterWhistle());
-                                conditionsToHide.add(
-                                                new Conditions(LogicType.NOR,
-                                                                CommonPatchRequirements.getVarlamoreAccess()));
+                                conditionsToHide.add(getConditionsToHideRequirement());
 
                                 break;
                         default:
                                 return null;
                 }
                 conditionsToHide.add(new Conditions(LogicType.NOR, getPatchReadyRequirement()));
+                conditionsToHide.removeIf(filter -> filter == null);
                 harvestStep.conditionToHideInSidebar(
                                 new Conditions(LogicType.OR, conditionsToHide));
                 harvestStep.addSubSteps(getPlantStep(questHelper));
@@ -224,9 +218,7 @@ public enum HerbPatch implements FarmingPatchRequirements {
                                                 new WorldPoint(1238, 3726, 0),
                                                 "Plant your seeds into the Farming Guild patch.",
                                                 CommonPatchRequirements.getFarmingGuildTeleport());
-                                conditionsToHide.add(
-                                                new Conditions(LogicType.NOR,
-                                                                CommonPatchRequirements.getFarmingGuildAccess()));
+                                conditionsToHide.add(getConditionsToHideRequirement());
                                 break;
                         case HARMONY:
                                 plantStep = new ObjectStep(
@@ -235,10 +227,7 @@ public enum HerbPatch implements FarmingPatchRequirements {
                                                 new WorldPoint(3789, 2837, 0),
                                                 "Plant your seeds into the Harmony patch.",
                                                 CommonPatchRequirements.getHarmonyIslandTeleport());
-                                conditionsToHide.add(
-                                                new Conditions(LogicType.NOR,
-                                                                new QuestRequirement(QuestHelperQuest.MORYTANIA_ELITE,
-                                                                                QuestState.FINISHED)));
+                                conditionsToHide.add(getConditionsToHideRequirement());
                                 break;
 
                         case MORYTANIA:
@@ -256,8 +245,7 @@ public enum HerbPatch implements FarmingPatchRequirements {
                                                 new WorldPoint(3605, 3529, 0),
                                                 "Plant your seeds into the Troll Stronghold patch.",
                                                 trollheimTeleport, stonyBasalt);
-                                conditionsToHide.add(
-                                                new Conditions(LogicType.NOR, accessToTrollStronghold));
+                                conditionsToHide.add(getConditionsToHideRequirement());
                                 break;
                         case WEISS:
                                 plantStep = new ObjectStep(
@@ -266,7 +254,7 @@ public enum HerbPatch implements FarmingPatchRequirements {
                                                 new WorldPoint(2848, 3934, 0),
                                                 "Plant your seeds into the Weiss patch.",
                                                 icyBasalt);
-                                conditionsToHide.add(new Conditions(LogicType.NOR, accessToWeiss));
+                                conditionsToHide.add(getConditionsToHideRequirement());
                                 break;
                         case HOSIDIUS:
                                 plantStep = new ObjectStep(
@@ -283,9 +271,7 @@ public enum HerbPatch implements FarmingPatchRequirements {
                                                 new WorldPoint(1582, 3094, 0),
                                                 "Plant your seeds into the Varlamore patch.",
                                                 CommonPatchRequirements.getHunterWhistle());
-                                conditionsToHide.add(
-                                                new Conditions(LogicType.NOR,
-                                                                CommonPatchRequirements.getVarlamoreAccess()));
+                                conditionsToHide.add(getConditionsToHideRequirement());
                                 break;
                         default:
                                 return null;
@@ -317,9 +303,7 @@ public enum HerbPatch implements FarmingPatchRequirements {
                                 return List.of(CommonPatchRequirements.getFarmingGuildTeleport());
                         case HARMONY:
                                 return List.of(CommonPatchRequirements.getHarmonyIslandTeleport()
-                                                .hideConditioned(new Conditions(LogicType.NOR,
-                                                                new QuestRequirement(QuestHelperQuest.MORYTANIA_ELITE,
-                                                                                QuestState.FINISHED))));
+                                                .hideConditioned(getConditionsToHideRequirement()));
                         case MORYTANIA:
                                 return List.of(CommonPatchRequirements.getEctophial());
                         case TROLL_STRONGHOLD:
@@ -332,6 +316,35 @@ public enum HerbPatch implements FarmingPatchRequirements {
                                 return List.of(CommonPatchRequirements.getHunterWhistle());
                         default:
                                 return List.of();
+                }
+        }
+
+        public Requirement getConditionsToHideRequirement() {
+                switch (this) {
+                        case ARDOUGNE:
+                                return null;
+                        case CATHERBY:
+                                return null;
+                        case FALADOR:
+                                return null;
+                        case FARMING_GUILD:
+                                return new Conditions(LogicType.NOR,
+                                                CommonPatchRequirements.getFarmingGuildAccess());
+                        case HARMONY:
+                                return new Conditions(LogicType.NOR, new QuestRequirement(
+                                                QuestHelperQuest.MORYTANIA_ELITE, QuestState.FINISHED));
+                        case MORYTANIA:
+                                return null;
+                        case TROLL_STRONGHOLD:
+                                return new Conditions(LogicType.NOR, accessToTrollStronghold);
+                        case WEISS:
+                                return new Conditions(LogicType.NOR, accessToWeiss);
+                        case HOSIDIUS:
+                                return null;
+                        case VARLAMORE:
+                                return new Conditions(LogicType.NOR, CommonPatchRequirements.getVarlamoreAccess());
+                        default:
+                                return null;
                 }
         }
 }
