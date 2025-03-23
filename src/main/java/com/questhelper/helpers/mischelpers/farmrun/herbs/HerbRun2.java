@@ -62,9 +62,8 @@ public class HerbRun2 extends AbstractFarmRun {
 
     private final String HERB_SEEDS = "farmrun_seed_herb";
 
-    public HerbRun2(Client client, QuestHelper questHelper, FarmingWorld farmingWorld,
-            FarmingHandler farmingHandler) {
-        super(client, questHelper, farmingWorld, farmingHandler);
+    public HerbRun2(QuestHelper questHelper, FarmingWorld farmingWorld, FarmingHandler farmingHandler) {
+        super(questHelper, farmingWorld, farmingHandler);        
         this.patchRequirements = new ArrayList<>();
     }
 
