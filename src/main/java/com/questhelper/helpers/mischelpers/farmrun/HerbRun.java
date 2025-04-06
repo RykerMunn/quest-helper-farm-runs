@@ -80,9 +80,6 @@ public class HerbRun extends ComplexStateQuestHelper {
 	private HashSet<ItemRequirement> allRequiredItems = new HashSet<>();
 	private HashSet<ItemRequirement> allRecommendedItems = new HashSet<>();
 
-	private final Comparator<ItemRequirement> itemRequirementComparator = Comparator
-			.comparing(ItemRequirement::getName);
-
 	DetailedQuestStep waitForHerbs, ardougnePatch, catherbyPatch, faladorPatch, farmingGuildPatch, harmonyPatch,
 			morytaniaPatch, trollStrongholdPatch, weissPatch, hosidiusPatch, varlamorePatch;
 
@@ -255,14 +252,22 @@ public class HerbRun extends ComplexStateQuestHelper {
 	public List<ItemRequirement> getItemRequirements() {
 		allRequiredItems.clear();
 		if (bPatchesSelected) {
-
 			for (var patch : selectedPatches.values()) {
-				allRequiredItems.addAll(patch.getRequiredItems());
+				List<ItemRequirement> orderedItems = patch.getRequiredItems();
+				allRequiredItems.addAll(orderedItems);
 			}
-
 		}
 		var list = new ArrayList<>(allRequiredItems);
-		list.sort(itemRequirementComparator);
+		list.sort(Comparator.comparingInt(item -> {
+			for (var patch : selectedPatches.values()) {
+				List<ItemRequirement> orderedItems = patch.getRequiredItems();
+				int index = orderedItems.indexOf(item);
+				if (index != -1) {
+					return index;
+				}
+			}
+			return Integer.MAX_VALUE; // Items not found in any patch are placed at the end
+		}));
 		return list;
 	}
 
@@ -270,15 +275,22 @@ public class HerbRun extends ComplexStateQuestHelper {
 	public List<ItemRequirement> getItemRecommended() {
 		allRecommendedItems.clear();
 		if (bPatchesSelected) {
-
 			for (var patch : selectedPatches.values()) {
-
-				allRecommendedItems.addAll(patch.getRecommendedItems());
+				List<ItemRequirement> orderedItems = patch.getRecommendedItems();
+				allRecommendedItems.addAll(orderedItems);
 			}
-
 		}
 		var list = new ArrayList<>(allRecommendedItems);
-		list.sort(itemRequirementComparator);
+		list.sort(Comparator.comparingInt(item -> {
+			for (var patch : selectedPatches.values()) {
+				List<ItemRequirement> orderedItems = patch.getRecommendedItems();
+				int index = orderedItems.indexOf(item);
+				if (index != -1) {
+					return index;
+				}
+			}
+			return Integer.MAX_VALUE; // Items not found in any patch are placed at the end
+		}));
 		return list;
 	}
 
