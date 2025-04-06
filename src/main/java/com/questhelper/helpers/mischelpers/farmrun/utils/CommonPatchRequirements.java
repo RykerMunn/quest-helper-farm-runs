@@ -2,7 +2,6 @@ package com.questhelper.helpers.mischelpers.farmrun.utils;
 
 import com.questhelper.collections.ItemCollections;
 import com.questhelper.questinfo.QuestHelperQuest;
-import com.questhelper.requirements.Requirement;
 import com.questhelper.requirements.item.ItemRequirement;
 import com.questhelper.requirements.item.ItemRequirements;
 import com.questhelper.requirements.player.SkillRequirement;
@@ -105,7 +104,7 @@ public class CommonPatchRequirements {
                 new ItemRequirement("Law rune", ItemID.LAW_RUNE, 1),
                 new ItemRequirement("Soul rune", ItemID.SOUL_RUNE, 1));
         harmonyIslandRunes.showConditioned(new SkillRequirement(Skill.MAGIC, 65));
-        
+
         ItemRequirement harmonyIslandTable = new ItemRequirement("Harmony Island teleport",
                 ItemID.HARMONY_ISLAND_TELEPORT);
 
@@ -122,7 +121,8 @@ public class CommonPatchRequirements {
     }
 
     public static ItemRequirement getHosidiusTeleport() {
-        ItemRequirement hosidiusHouseTeleport = new ItemRequirement("Teleport to Hosidius House (Tablet or Xeric's Talisman)",
+        ItemRequirement hosidiusHouseTeleport = new ItemRequirement(
+                "Teleport to Hosidius House (Tablet or Xeric's Talisman)",
                 ItemID.HOSIDIUS_TELEPORT);
         hosidiusHouseTeleport.addAlternates(ItemID.XERICS_TALISMAN);
         return hosidiusHouseTeleport;
@@ -138,5 +138,35 @@ public class CommonPatchRequirements {
         hunterWhistle.addAlternates(ItemID.BASIC_QUETZAL_WHISTLE);
         hunterWhistle.addAlternates(ItemID.ENHANCED_QUETZAL_WHISTLE);
         return hunterWhistle;
+    }
+
+    public static QuestRequirement getPrifddinasAccess() {
+        return new QuestRequirement(QuestHelperQuest.SONG_OF_THE_ELVES, QuestState.FINISHED);
+    }
+
+    public static ItemRequirements getPrifddinasTeleport() {
+        // teleport crystal or house teleport / redirect tab
+        ItemRequirement teleportCrystal = new ItemRequirement("Teleport crystal", ItemCollections.TELEPORT_CRYSTAL);
+
+        ItemRequirement prifddinasTablet = new ItemRequirement("Prifddinas teleport", ItemID.PRIFDDINAS_TELEPORT);
+        ItemRequirement houseTeleport = new ItemRequirement("House teleport", ItemID.TELEPORT_TO_HOUSE);
+        houseTeleport.addAlternates(ItemID.CONSTRUCT_CAPE, ItemID.CONSTRUCT_CAPET);
+
+        ItemRequirement houseTeleportRunes = new ItemRequirements(
+                "Runes for House Teleport",
+                new ItemRequirement("Law rune", ItemID.LAW_RUNE),
+                new ItemRequirement("Air rune", ItemID.AIR_RUNE, 1),
+                new ItemRequirement("Earth rune", ItemID.EARTH_RUNE, 1));
+
+        houseTeleportRunes.showConditioned(new SkillRequirement(Skill.MAGIC, 40));
+
+        ItemRequirements prifddinasTeleport = new ItemRequirements(LogicType.OR, "Prifddinas Teleport",
+                teleportCrystal, prifddinasTablet, houseTeleport, houseTeleportRunes);
+        prifddinasTeleport.setTooltip("Teleport crystal, Prifddinas teleport tablet, or house teleport.");
+
+        prifddinasTeleport.showConditioned(getPrifddinasAccess());
+
+        prifddinasTeleport.setQuantity(1);
+        return prifddinasTeleport;
     }
 }
