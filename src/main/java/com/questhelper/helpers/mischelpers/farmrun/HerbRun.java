@@ -334,6 +334,8 @@ public class HerbRun extends ComplexStateQuestHelper {
 				allRequiredItems.addAll(orderedItems);
 			}
 		}
+		allRequiredItems.add(farmersOutfit);
+		allRequiredItems.add(gracefulOutfit);
 		var list = new ArrayList<>(allRequiredItems);
 		list.sort(Comparator.comparingInt(item -> {
 			for (var patch : selectedPatches.values()) {
