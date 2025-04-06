@@ -32,8 +32,8 @@ public enum HerbPatch implements FarmingPatchRequirements {
         MORYTANIA(new ManualRequirement(), new ManualRequirement()),
         TROLL_STRONGHOLD(new ManualRequirement(), new ManualRequirement()),
         WEISS(new ManualRequirement(), new ManualRequirement()),
-        HOSIDIUS(new ManualRequirement(), new ManualRequirement()),
-        VARLAMORE(new ManualRequirement(), new ManualRequirement());
+        KOUREND(new ManualRequirement(), new ManualRequirement()),
+        CIVITAS_ILLA_FORTIS(new ManualRequirement(), new ManualRequirement());
 
         private final ManualRequirement empty;
 
@@ -154,7 +154,7 @@ public enum HerbPatch implements FarmingPatchRequirements {
                                                 icyBasalt);
                                 conditionsToHide.add(getConditionsToHideRequirement());
                                 break;
-                        case HOSIDIUS:
+                        case KOUREND:
                                 harvestStep = new ObjectStep(
                                                 questHelper,
                                                 NullObjectID.NULL_27115,
@@ -162,7 +162,7 @@ public enum HerbPatch implements FarmingPatchRequirements {
                                                 "Harvest your herbs from the Hosidius patch.",
                                                 CommonPatchRequirements.getHosidiusTeleport());
                                 break;
-                        case VARLAMORE:
+                        case CIVITAS_ILLA_FORTIS:
                                 harvestStep = new ObjectStep(
                                                 questHelper,
                                                 NullObjectID.NULL_50697,
@@ -256,7 +256,7 @@ public enum HerbPatch implements FarmingPatchRequirements {
                                                 icyBasalt);
                                 conditionsToHide.add(getConditionsToHideRequirement());
                                 break;
-                        case HOSIDIUS:
+                        case KOUREND:
                                 plantStep = new ObjectStep(
                                                 questHelper,
                                                 NullObjectID.NULL_27115,
@@ -264,7 +264,7 @@ public enum HerbPatch implements FarmingPatchRequirements {
                                                 "Plant your seeds into the Hosidius patch.",
                                                 CommonPatchRequirements.getHosidiusTeleport());
                                 break;
-                        case VARLAMORE:
+                        case CIVITAS_ILLA_FORTIS:
                                 plantStep = new ObjectStep(
                                                 questHelper,
                                                 NullObjectID.NULL_50697,
@@ -310,9 +310,9 @@ public enum HerbPatch implements FarmingPatchRequirements {
                                 return List.of(trollheimTeleport, stonyBasalt);
                         case WEISS:
                                 return List.of(icyBasalt);
-                        case HOSIDIUS:
+                        case KOUREND:
                                 return List.of(CommonPatchRequirements.getHosidiusTeleport());
-                        case VARLAMORE:
+                        case CIVITAS_ILLA_FORTIS:
                                 return List.of(CommonPatchRequirements.getHunterWhistle());
                         default:
                                 return List.of();
@@ -339,9 +339,9 @@ public enum HerbPatch implements FarmingPatchRequirements {
                                 return new Conditions(LogicType.NOR, accessToTrollStronghold);
                         case WEISS:
                                 return new Conditions(LogicType.NOR, accessToWeiss);
-                        case HOSIDIUS:
+                        case KOUREND:
                                 return null;
-                        case VARLAMORE:
+                        case CIVITAS_ILLA_FORTIS:
                                 return new Conditions(LogicType.NOR, CommonPatchRequirements.getVarlamoreAccess());
                         default:
                                 return null;
