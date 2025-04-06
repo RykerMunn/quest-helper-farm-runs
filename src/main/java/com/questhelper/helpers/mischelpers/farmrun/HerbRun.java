@@ -426,6 +426,15 @@ public class HerbRun extends ComplexStateQuestHelper {
 		startUpStep(step);
 	}
 
+	@Override 
+	public void shutDown() {
+		selectedPatches.forEachValue(var, patch -> {
+			patch.shutDown();
+			eventBus.unregister(patch);
+		});
+		selectedPatches.clear();
+	}
+
 	private List<PatchImplementation> parsePatchImplementations(String str) {
 		List<PatchImplementation> patches = new ArrayList<>();
 		if (str == null || str.isEmpty()) {
