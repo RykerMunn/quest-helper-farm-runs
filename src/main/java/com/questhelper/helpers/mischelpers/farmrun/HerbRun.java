@@ -234,7 +234,8 @@ public class HerbRun extends ComplexStateQuestHelper {
 					FarmRunBuilder builder = FarmRunBuilder.builder()
 							.withQuestHelper(this)
 							.withFarmingHandler(farmingHandler)
-							.withFarmingWorld(farmingWorld);
+							.withFarmingWorld(farmingWorld)
+							.withEventBus(eventBus);
 					synchronized (selectedPatches) {
 						patches.forEach(patch -> {
 							builder.withPatchImplementation(patch);
@@ -304,6 +305,9 @@ public class HerbRun extends ComplexStateQuestHelper {
 		allSteps.add(new PanelDetails("Selecting patch types", Arrays.asList(selectingPatchTypeStep)));
 		synchronized (selectedPatches) {
 			for (var patch : selectedPatches.values()) {
+				if (!patch.isInitialized()){
+					patch.loadStep();
+				}
 				var panel = patch.getPanelDetails();
 				// TODO: setDisplayCondition
 				panel.setDisplayCondition(herbPatchSelected);
@@ -330,7 +334,8 @@ public class HerbRun extends ComplexStateQuestHelper {
 				FarmRunBuilder builder = FarmRunBuilder.builder()
 						.withQuestHelper(this)
 						.withFarmingHandler(farmingHandler)
-						.withFarmingWorld(farmingWorld);
+						.withFarmingWorld(farmingWorld)
+						.withEventBus(eventBus);
 
 				patches.forEach(patch -> {
 					builder.withPatchImplementation(patch);

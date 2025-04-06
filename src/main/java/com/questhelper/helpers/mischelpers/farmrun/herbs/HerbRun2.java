@@ -44,13 +44,15 @@ public class HerbRun2 extends AbstractFarmRun {
 
     private List<Requirement> patchRequirements;
 
+    private Boolean initialized = false;
+
     private enum HerbSeed {
         GUAM(ItemID.GUAM_SEED), MARRENTILL(ItemID.MARRENTILL_SEED), TARROMIN(ItemID.TARROMIN_SEED),
         HARRALANDER(ItemID.HARRALANDER_SEED),
         RANARR(ItemID.RANARR_SEED), TOADFLAX(ItemID.TOADFLAX_SEED), IRIT(ItemID.IRIT_SEED),
         AVANTOE(ItemID.AVANTOE_SEED), KWUARM(ItemID.KWUARM_SEED),
         SNAPDRAGON(ItemID.SNAPDRAGON_SEED), HUASCA(ItemID.HUASCA_SEED), CADANTINE(ItemID.CADANTINE_SEED),
-        LATANDYME(ItemID.LANTADYME_SEED),
+        LANTADYME(ItemID.LANTADYME_SEED),
         DWARF_WEED(ItemID.DWARF_WEED_SEED), TORSTOL(ItemID.TORSTOL_SEED);
 
         final int seedID;
@@ -65,6 +67,12 @@ public class HerbRun2 extends AbstractFarmRun {
     public HerbRun2(QuestHelper questHelper, FarmingWorld farmingWorld, FarmingHandler farmingHandler) {
         super(questHelper, farmingWorld, farmingHandler);        
         this.patchRequirements = new ArrayList<>();
+        this.patches = List.of(HerbPatch.values());
+    }
+
+    @Override
+    public boolean isInitialized() {
+        return initialized;
     }
 
     @Override
@@ -72,14 +80,13 @@ public class HerbRun2 extends AbstractFarmRun {
         setupConditions();
         setupSteps();
         addSteps();
-
+        this.initialized = true;
         return herbRunStep;
     }
 
     @Override
     protected void setupConditions() {
         var configManager = questHelper.getConfigManager();
-        patches = List.of(HerbPatch.values());
         seedItemRequirement = new ItemRequirement("Seeds of your choice", ItemID.GUAM_SEED);
         String seedName = configManager.getRSProfileConfiguration(QuestHelperConfig.QUEST_BACKGROUND_GROUP, HERB_SEEDS);
 
@@ -135,6 +142,9 @@ public class HerbRun2 extends AbstractFarmRun {
 
     @Subscribe
     public void onGameTick(GameTick event) {
+        if (this.initialized == false) {
+            return;
+        }
         int seedsNeeded = 0;
         for (FarmingPatch patch : farmingWorld.getTabs().get(Tab.HERB)) {
 
@@ -180,7 +190,11 @@ public class HerbRun2 extends AbstractFarmRun {
             return;
         if (event.getKey().equals(HERB_SEEDS)) {
             try {
-                HerbSeed selectedSeed = HerbSeed.valueOf(event.getNewValue());
+                String seedName = event.getNewValue();
+                if (seedName == null || seedName.isEmpty()) {
+                    return;
+                }
+                HerbSeed selectedSeed = HerbSeed.valueOf(seedName.replace(' ', '_').toUpperCase());
                 seedItemRequirement.setId(selectedSeed.seedID);
                 seedItemRequirement.setName(Text.titleCase(selectedSeed) + " seed");
                 questHelper.getQuestHelperPlugin().refreshBank();
