@@ -87,6 +87,7 @@ public final class FarmRunBuilder {
                 farmRun = new HerbRun2(questHelper, farmingWorld, farmingHandler);
                 break;
             default:
+                assert false : "No implementation found for " + patchImplementation;
                 break;
         }
 
