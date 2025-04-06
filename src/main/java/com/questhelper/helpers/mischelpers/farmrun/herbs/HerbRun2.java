@@ -38,7 +38,7 @@ public class HerbRun2 extends AbstractFarmRun {
     private static final String HERB_SEEDS = "farmrun_seed_herb";
 
     public HerbRun2(QuestHelper questHelper, FarmingWorld farmingWorld, FarmingHandler farmingHandler) {
-        super(questHelper, farmingWorld, farmingHandler, HERB_SEEDS, Tab.HERB);
+        super(questHelper, farmingWorld, farmingHandler, HERB_SEEDS, Tab.HERB, HerbSeed.GUAM);
         this.patches = List.of(HerbPatch.values());
         this.setGrowthStepText("Wait for your herbs to grow.");
         this.setSeedItemRequirementText("Herb seeds of your choice.");

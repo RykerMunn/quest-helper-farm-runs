@@ -30,7 +30,7 @@ public class FlowerRun extends AbstractFarmRun {
     private static final String FLOWER_SEEDS = "farmrun_seed_flower";
 
     public FlowerRun(QuestHelper questHelper, FarmingWorld farmingWorld, FarmingHandler farmingHandler) {
-        super(questHelper, farmingWorld, farmingHandler, FLOWER_SEEDS, Tab.FLOWER);
+        super(questHelper, farmingWorld, farmingHandler, FLOWER_SEEDS, Tab.FLOWER, FlowerSeed.MARIGOLD);
         this.patches = List.of(FlowerPatch.values());
         this.setGrowthStepText("Wait for your flowers to grow.");
         this.setSeedItemRequirementText("Flower seeds of your choice.");

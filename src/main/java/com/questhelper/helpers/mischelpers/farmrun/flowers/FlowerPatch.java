@@ -16,10 +16,12 @@ import com.questhelper.requirements.util.LogicType;
 import com.questhelper.steps.ObjectStep;
 import com.questhelper.steps.QuestStep;
 
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.ItemID;
 import net.runelite.api.NullObjectID;
 import net.runelite.api.coords.WorldPoint;
 
+@Slf4j
 public enum FlowerPatch implements FarmingPatchRequirements {
     UNKNOWN(new ManualRequirement(), new ManualRequirement()),
     ARDOUGNE(new ManualRequirement(), new ManualRequirement()),
@@ -97,7 +99,7 @@ public enum FlowerPatch implements FarmingPatchRequirements {
                         CommonPatchRequirements.getEctophial());
                 break;
             case PRIFDDINAS:
-                assert false : "I don't have access to this patch. Please add it.";
+                log.warn("I don't have access to this patch. Please add it.");
                 return null;
             case KOUREND:
                 harvestStep = new ObjectStep(
@@ -112,7 +114,7 @@ public enum FlowerPatch implements FarmingPatchRequirements {
                         questHelper,
                         NullObjectID.NULL_50693,
                         new WorldPoint(1585, 3098, 0),
-                        "Harvest your flowers from the Farming Guild patch.",
+                        "Harvest your flowers from the Varlamore patch.",
                         CommonPatchRequirements.getHunterWhistle());
                 break;
             default:
@@ -175,7 +177,7 @@ public enum FlowerPatch implements FarmingPatchRequirements {
                         CommonPatchRequirements.getEctophial());
                 break;
             case PRIFDDINAS:
-                assert false : "I don't have access to this patch. Please add it.";
+                log.warn("I don't have access to this patch. Please add it.");
                 return null;
             case KOUREND:
                 plantStep = new ObjectStep(

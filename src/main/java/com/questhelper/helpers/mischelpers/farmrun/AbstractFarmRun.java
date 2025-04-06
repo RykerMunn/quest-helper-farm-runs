@@ -27,6 +27,9 @@ import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
 import com.questhelper.steps.QuestStep;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.AccessLevel;
 import net.runelite.api.ItemID;
 import net.runelite.api.Varbits;
 import net.runelite.api.events.GameTick;
@@ -66,8 +69,18 @@ public abstract class AbstractFarmRun extends QuestStep {
 
     private Tab timeTrackingTab;
 
+    @Getter
+    @Setter(AccessLevel.PROTECTED)
+    private Requirement conditionToHide;
+
+    protected FarmingWorld farmingWorld;
+
+    protected FarmingHandler farmingHandler;
+
+    private Enum<?> defaultSeed;
+
     public AbstractFarmRun(QuestHelper questHelper, FarmingWorld farmingWorld, FarmingHandler farmingHandler,
-            String configKey, Tab tab) {
+            String configKey, Tab tab, Enum<?> defaultSeed) {
         super(questHelper);
         this.farmingWorld = farmingWorld;
         this.farmingHandler = farmingHandler;
@@ -76,6 +89,7 @@ public abstract class AbstractFarmRun extends QuestStep {
         this.configKey = configKey;
         assert this.configKey != null && !this.configKey.isEmpty() : "Config key cannot be null or empty";
         this.timeTrackingTab = tab;
+        this.defaultSeed = defaultSeed;
         requiredItems = new HashSet<>();
         recommendedItems = new HashSet<>();
         compostItemRequirement.setDisplayMatchedItemName(true);
@@ -94,10 +108,6 @@ public abstract class AbstractFarmRun extends QuestStep {
     public boolean isInitialized() {
         return initialized;
     }
-
-    protected FarmingWorld farmingWorld;
-
-    protected FarmingHandler farmingHandler;
 
     public ConditionalStep loadStep() {
         setupConditions();
