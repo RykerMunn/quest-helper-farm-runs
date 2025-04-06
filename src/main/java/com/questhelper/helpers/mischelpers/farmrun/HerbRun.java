@@ -31,14 +31,11 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CountDownLatch;
 
 import javax.inject.Inject;
 
 import com.questhelper.QuestHelperConfig;
 import com.questhelper.collections.ItemCollections;
-import com.questhelper.helpers.mischelpers.farmrun.herbs.HerbRun2;
 import com.questhelper.helpers.mischelpers.farmrun.utils.FarmingHandler;
 import com.questhelper.helpers.mischelpers.farmrun.utils.FarmingWorld;
 import com.questhelper.helpers.mischelpers.farmrun.utils.PatchImplementation;
@@ -47,8 +44,6 @@ import com.questhelper.collections.ItemCollections;
 import com.questhelper.panel.PanelDetails;
 import com.questhelper.questhelpers.ComplexStateQuestHelper;
 import com.questhelper.questinfo.HelperConfig;
-import com.questhelper.questinfo.QuestHelperQuest;
-import com.questhelper.requirements.ManualRequirement;
 import com.questhelper.requirements.Requirement;
 import com.questhelper.requirements.item.ItemRequirement;
 import com.questhelper.requirements.item.ItemRequirements;
@@ -89,24 +84,9 @@ public class HerbRun extends ComplexStateQuestHelper {
 	private HashSet<ItemRequirement> allRequiredItems = new HashSet<>();
 	private HashSet<ItemRequirement> allRecommendedItems = new HashSet<>();
 
-	DetailedQuestStep waitForHerbs, ardougnePatch, catherbyPatch, faladorPatch, farmingGuildPatch, harmonyPatch,
-			morytaniaPatch, trollStrongholdPatch, weissPatch, hosidiusPatch, varlamorePatch;
-
-	DetailedQuestStep ardougnePlant, catherbyPlant, faladorPlant, farmingGuildPlant, harmonyPlant, morytaniaPlant,
-			trollStrongholdPlant, weissPlant, hosidiusPlant, varlamorePlant;
-	ItemRequirement spade, dibber, rake, seed, compost;
-	ItemRequirement ectophial, magicSec, explorerRing2, ardyCloak2, xericsTalisman, catherbyTeleport, trollheimTeleport,
-			icyBasalt, stonyBasalt, farmingGuildTeleport, hosidiusHouseTeleport, hunterWhistle;
 	ItemRequirement gracefulHood, gracefulTop, gracefulLegs, gracefulGloves, gracefulBoots, gracefulCape,
 			gracefulOutfit;
 	ItemRequirement farmingHat, farmingTop, farmingLegs, farmingBoots, farmersOutfit;
-
-	Requirement accessToHarmony, accessToWeiss, accessToTrollStronghold, accessToFarmingGuildPatch, accessToVarlamore;
-
-	ManualRequirement ardougneEmpty, catherbyEmpty, faladorEmpty, farmingGuildEmpty, harmonyEmpty, morytaniaEmpty,
-			trollStrongholdEmpty, weissEmpty, hosidiusEmpty, varlamoreEmpty;
-	ManualRequirement ardougneReady, catherbyReady, faladorReady, farmingGuildReady, harmonyReady, morytaniaReady,
-			trollStrongholdReady, weissReady, hosidiusReady, varlamoreReady;
 
 	Requirement patchTypesSelected, herbPatchSelected;
 	DetailedQuestStep selectingPatchTypeStep;
