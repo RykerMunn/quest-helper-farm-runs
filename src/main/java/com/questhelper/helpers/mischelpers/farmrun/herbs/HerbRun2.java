@@ -13,6 +13,7 @@ import com.questhelper.managers.QuestContainerManager;
 import com.questhelper.panel.PanelDetails;
 import com.questhelper.questhelpers.QuestHelper;
 import com.questhelper.requirements.Requirement;
+import com.questhelper.requirements.SimpleRequirement;
 import com.questhelper.requirements.conditional.Conditions;
 import com.questhelper.requirements.item.ItemRequirement;
 import com.questhelper.requirements.util.LogicType;
@@ -22,7 +23,6 @@ import com.questhelper.steps.DetailedQuestStep;
 import net.runelite.api.Client;
 import net.runelite.api.ItemID;
 import net.runelite.api.events.GameTick;
-import net.runelite.client.callback.ClientThread;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.timetracking.Tab;
@@ -65,7 +65,7 @@ public class HerbRun2 extends AbstractFarmRun {
     private final String HERB_SEEDS = "farmrun_seed_herb";
 
     public HerbRun2(QuestHelper questHelper, FarmingWorld farmingWorld, FarmingHandler farmingHandler) {
-        super(questHelper, farmingWorld, farmingHandler);        
+        super(questHelper, farmingWorld, farmingHandler);
         this.patchRequirements = new ArrayList<>();
         this.patches = List.of(HerbPatch.values());
     }

@@ -55,7 +55,6 @@ public class CommonPatchRequirements {
         catherybyTeleport.setTooltip(
                 "Lunar Spellbook (Lvl 87 Magic) or Catherby teleport tablet. Camelot teleport is an alternative.");
         catherybyTeleport.setQuantity(1);
-        catherybyTeleport.setDisplayMatchedItemName(true);
         return catherybyTeleport;
     }
 
