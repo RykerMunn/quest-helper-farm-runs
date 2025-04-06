@@ -1,5 +1,6 @@
 package com.questhelper.helpers.mischelpers.farmrun;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -30,6 +31,9 @@ public abstract class AbstractFarmRun extends QuestStep {
     private final Comparator<ItemRequirement> itemRequirementComparator = Comparator
             .comparing(ItemRequirement::getName);
 
+    private final HashSet<ItemRequirement> alwaysRequiredItems = new HashSet<>();
+    private final HashSet<ItemRequirement> alwaysRecommendedItems = new HashSet<>();
+
     public AbstractFarmRun(QuestHelper questHelper, FarmingWorld farmingWorld, FarmingHandler farmingHandler) {
         super(questHelper);
         this.farmingWorld = farmingWorld;
@@ -39,14 +43,13 @@ public abstract class AbstractFarmRun extends QuestStep {
         requiredItems = new HashSet<>();
         recommendedItems = new HashSet<>();
         compostItemRequirement.setDisplayMatchedItemName(true);
-        requiredItems.add(new ItemRequirement("Seed dibber", ItemID.SEED_DIBBER));
-        requiredItems.add(new ItemRequirement("Spade", ItemID.SPADE));
-        requiredItems.add(new ItemRequirement("Rake", ItemID.RAKE)
+        alwaysRequiredItems.add(new ItemRequirement("Seed dibber", ItemID.SEED_DIBBER));
+        alwaysRequiredItems.add(new ItemRequirement("Spade", ItemID.SPADE));
+        alwaysRequiredItems.add(new ItemRequirement("Rake", ItemID.RAKE)
                 .hideConditioned(new VarbitRequirement(Varbits.AUTOWEED, 2)));
-        requiredItems.add(compostItemRequirement);
+        alwaysRequiredItems.add(compostItemRequirement);
 
-        recommendedItems.add(new ItemRequirement("Magic secateurs", ItemID.MAGIC_SECATEURS));
-
+        alwaysRecommendedItems.add(new ItemRequirement("Magic secateurs", ItemID.MAGIC_SECATEURS));
     }
 
     public abstract boolean isInitialized();
@@ -96,15 +99,21 @@ public abstract class AbstractFarmRun extends QuestStep {
     }
 
     protected List<ItemRequirement> getRequiredItems() {
-        List<ItemRequirement> items = Arrays.asList(requiredItems.toArray(ItemRequirement[]::new));
-        items.sort(itemRequirementComparator);
-        return items;
+        List<ItemRequirement> alwaysRequiredList = new ArrayList<>(alwaysRequiredItems);
+        alwaysRequiredList.sort(itemRequirementComparator);
+        List<ItemRequirement> requiredList = new ArrayList<>(requiredItems);
+        requiredList.sort(itemRequirementComparator);
+        alwaysRequiredList.addAll(requiredList);
+        return alwaysRequiredList;
     }
 
     protected List<ItemRequirement> getRecommendedItems() {
-        List<ItemRequirement> items = Arrays.asList(recommendedItems.toArray(ItemRequirement[]::new));
-        items.sort(itemRequirementComparator);
-        return items;
+        List<ItemRequirement> alwaysRecommendedList = new ArrayList<>(alwaysRecommendedItems);
+        alwaysRecommendedList.sort(itemRequirementComparator);
+        List<ItemRequirement> recommendedList = new ArrayList<>(recommendedItems);
+        recommendedList.sort(itemRequirementComparator);
+        alwaysRecommendedList.addAll(recommendedList);
+        return alwaysRecommendedList;
     }
 
     protected void setRequiredCompostQuantity(int quantity) {
