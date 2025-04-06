@@ -49,6 +49,8 @@ public abstract class AbstractFarmRun extends QuestStep {
 
     }
 
+    public abstract boolean isInitialized();
+
     protected FarmingWorld farmingWorld;
 
     protected FarmingHandler farmingHandler;
