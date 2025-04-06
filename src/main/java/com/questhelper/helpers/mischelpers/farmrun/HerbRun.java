@@ -27,6 +27,7 @@ package com.questhelper.helpers.mischelpers.farmrun;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -88,6 +89,9 @@ public class HerbRun extends ComplexStateQuestHelper {
 
 	private HashSet<ItemRequirement> allRequiredItems = new HashSet<>();
 	private HashSet<ItemRequirement> allRecommendedItems = new HashSet<>();
+
+	private final Comparator<ItemRequirement> itemRequirementComparator = Comparator
+			.comparing(ItemRequirement::getName);
 
 	DetailedQuestStep waitForHerbs, ardougnePatch, catherbyPatch, faladorPatch, farmingGuildPatch, harmonyPatch,
 			morytaniaPatch, trollStrongholdPatch, weissPatch, hosidiusPatch, varlamorePatch;
@@ -343,7 +347,9 @@ public class HerbRun extends ComplexStateQuestHelper {
 				}
 			}
 		}
-		return new ArrayList<>(allRequiredItems);
+		var list = new ArrayList<>(allRequiredItems);
+		list.sort(itemRequirementComparator);
+		return list;
 	}
 
 	@Override
@@ -357,7 +363,9 @@ public class HerbRun extends ComplexStateQuestHelper {
 				}
 			}
 		}
-		return new ArrayList<>(allRecommendedItems);
+		var list = new ArrayList<>(allRecommendedItems);
+		list.sort(itemRequirementComparator);
+		return list;
 	}
 
 	@Override
@@ -382,8 +390,11 @@ public class HerbRun extends ComplexStateQuestHelper {
 		allSteps.add(new PanelDetails("Selecting patch types", Arrays.asList(selectingPatchTypeStep)));
 		synchronized (selectedPatches) {
 			for (var patch : selectedPatches.values()) {
-				if (!patch.isInitialized()){
-					patch.loadStep();
+				if (!patch.isInitialized()) {
+					// this means `loadStep` didn't have any selected patches
+					// but still tried to load a selected patch step!
+					assert false : "Patch is not initialized";
+					continue;
 				}
 				var panel = patch.getPanelDetails();
 				// TODO: setDisplayCondition
@@ -397,10 +408,6 @@ public class HerbRun extends ComplexStateQuestHelper {
 	@Override
 	public void startUp(QuestHelperConfig helperConfig) {
 		farmingHandler = new FarmingHandler(client, configManager);
-		step = loadStep();
-		this.config = helperConfig;
-		instantiateSteps(Collections.singletonList(step));
-		var = getVar();
 		String patchSelectionTest = this.getConfigManager()
 				.getRSProfileConfiguration(QuestHelperConfig.QUEST_BACKGROUND_GROUP, PATCH_SELECTION);
 		if (patchSelectionTest == null || patchSelectionTest.isEmpty()) {
@@ -422,11 +429,15 @@ public class HerbRun extends ComplexStateQuestHelper {
 				bPatchesSelected = selectedPatches.size() > 0;
 			}
 		}
+		step = loadStep();
+		this.config = helperConfig;
+		instantiateSteps(Collections.singletonList(step));
+		var = getVar();
 
 		startUpStep(step);
 	}
 
-	@Override 
+	@Override
 	public void shutDown() {
 		selectedPatches.forEachValue(var, patch -> {
 			patch.shutDown();
