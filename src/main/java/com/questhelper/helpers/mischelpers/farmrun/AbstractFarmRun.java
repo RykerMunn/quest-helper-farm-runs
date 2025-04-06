@@ -7,11 +7,13 @@ import java.util.HashSet;
 import java.util.List;
 
 import com.questhelper.collections.ItemCollections;
+import com.questhelper.config.ConfigKeys;
 import com.questhelper.helpers.mischelpers.farmrun.utils.FarmingHandler;
 import com.questhelper.helpers.mischelpers.farmrun.utils.FarmingWorld;
 import com.questhelper.panel.PanelDetails;
 import com.questhelper.questhelpers.QuestHelper;
 import com.questhelper.requirements.item.ItemRequirement;
+import com.questhelper.requirements.runelite.RuneliteRequirement;
 import com.questhelper.requirements.var.VarbitRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.QuestStep;
@@ -43,7 +45,10 @@ public abstract class AbstractFarmRun extends QuestStep {
         requiredItems = new HashSet<>();
         recommendedItems = new HashSet<>();
         compostItemRequirement.setDisplayMatchedItemName(true);
-        alwaysRequiredItems.add(new ItemRequirement("Seed dibber", ItemID.SEED_DIBBER));
+        alwaysRequiredItems.add(new ItemRequirement("Seed dibber", ItemID.SEED_DIBBER)
+                .hideConditioned(new RuneliteRequirement(questHelper.getConfigManager(),
+                        ConfigKeys.BARBARIAN_TRAINING_FINISHED_SEED_PLANTING.getKey(), "true",
+                        "Completed the Barbarian bare-handed farming training.")));
         alwaysRequiredItems.add(new ItemRequirement("Spade", ItemID.SPADE));
         alwaysRequiredItems.add(new ItemRequirement("Rake", ItemID.RAKE)
                 .hideConditioned(new VarbitRequirement(Varbits.AUTOWEED, 2)));
