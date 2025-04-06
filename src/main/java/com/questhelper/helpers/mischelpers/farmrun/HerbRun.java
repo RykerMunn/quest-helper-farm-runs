@@ -84,8 +84,7 @@ public class HerbRun extends ComplexStateQuestHelper {
 
 	private FarmingHandler farmingHandler;
 	private boolean bPatchesSelected = false;
-	private ConcurrentHashMap<PatchImplementation, AbstractFarmRun> selectedPatches = new ConcurrentHashMap<>();
-	private final CountDownLatch loadStepLatch = new CountDownLatch(1);
+	private HashMap<PatchImplementation, AbstractFarmRun> selectedPatches = new HashMap<>();
 
 	private HashSet<ItemRequirement> allRequiredItems = new HashSet<>();
 	private HashSet<ItemRequirement> allRecommendedItems = new HashSet<>();
@@ -135,16 +134,11 @@ public class HerbRun extends ComplexStateQuestHelper {
 		// when no other step condition is met, `waitForHerbs` is the default step.
 		ConditionalStep steps = new ConditionalStep(this, selectingPatchTypeStep);
 
-		synchronized (selectedPatches) {
-			for (var patch : selectedPatches.values()) {
-				// TODO: herbPatchSelected check
-				var questStep = patch.loadStep();
-				steps.addStep(herbPatchSelected, questStep);
-			}
+		for (var patch : selectedPatches.values()) {
+			// TODO: herbPatchSelected check
+			var questStep = patch.loadStep();
+			steps.addStep(herbPatchSelected, questStep);
 		}
-
-		// signal that the step has been loaded.
-		loadStepLatch.countDown();
 
 		return steps;
 	}
@@ -309,30 +303,27 @@ public class HerbRun extends ComplexStateQuestHelper {
 		if (event.getKey().equals(PATCH_SELECTION)) {
 			String valueTest = event.getNewValue();
 			if (valueTest != null && !valueTest.isEmpty()) {
-				synchronized (selectedPatches) {
-					selectedPatches.clear();
-					var patches = parsePatchImplementations(valueTest);
-					FarmRunBuilder builder = FarmRunBuilder.builder()
-							.withQuestHelper(this)
-							.withFarmingHandler(farmingHandler)
-							.withFarmingWorld(farmingWorld)
-							.withEventBus(eventBus);
-					synchronized (selectedPatches) {
-						patches.forEach(patch -> {
-							builder.withPatchImplementation(patch);
-							selectedPatches.putIfAbsent(patch, builder.build());
-						});
-					}
+				selectedPatches.clear();
+				var patches = parsePatchImplementations(valueTest);
+				FarmRunBuilder builder = FarmRunBuilder.builder()
+						.withQuestHelper(this)
+						.withFarmingHandler(farmingHandler)
+						.withFarmingWorld(farmingWorld)
+						.withEventBus(eventBus);
 
-					bPatchesSelected = selectedPatches.size() > 0;
+				patches.forEach(patch -> {
+					builder.withPatchImplementation(patch);
+					selectedPatches.putIfAbsent(patch, builder.build());
+				});
 
-					seedsConfig.refresh(questHelperPlugin.getConfigManager());
+				bPatchesSelected = selectedPatches.size() > 0;
 
-					questHelperPlugin.getClientThread().invokeLater(() -> {
-						// steps and requirements need to be updated
-						questHelperPlugin.getQuestManager().startUpQuest(this, true);
-					});
-				}
+				seedsConfig.refresh(questHelperPlugin.getConfigManager());
+
+				questHelperPlugin.getClientThread().invokeLater(() -> {
+					// steps and requirements need to be updated
+					questHelperPlugin.getQuestManager().startUpQuest(this, true);
+				});
 			}
 		}
 	}
@@ -341,11 +332,11 @@ public class HerbRun extends ComplexStateQuestHelper {
 	public List<ItemRequirement> getItemRequirements() {
 		allRequiredItems.clear();
 		if (bPatchesSelected) {
-			synchronized (selectedPatches) {
-				for (var patch : selectedPatches.values()) {
-					allRequiredItems.addAll(patch.getRequiredItems());
-				}
+
+			for (var patch : selectedPatches.values()) {
+				allRequiredItems.addAll(patch.getRequiredItems());
 			}
+
 		}
 		var list = new ArrayList<>(allRequiredItems);
 		list.sort(itemRequirementComparator);
@@ -356,12 +347,12 @@ public class HerbRun extends ComplexStateQuestHelper {
 	public List<ItemRequirement> getItemRecommended() {
 		allRecommendedItems.clear();
 		if (bPatchesSelected) {
-			synchronized (selectedPatches) {
-				for (var patch : selectedPatches.values()) {
 
-					allRecommendedItems.addAll(patch.getRecommendedItems());
-				}
+			for (var patch : selectedPatches.values()) {
+
+				allRecommendedItems.addAll(patch.getRecommendedItems());
 			}
+
 		}
 		var list = new ArrayList<>(allRecommendedItems);
 		list.sort(itemRequirementComparator);
@@ -379,29 +370,23 @@ public class HerbRun extends ComplexStateQuestHelper {
 
 	@Override
 	public List<PanelDetails> getPanels() {
-		try {
-			// Wait for loadStep to complete
-			loadStepLatch.await();
-		} catch (InterruptedException e) {
-			Thread.currentThread().interrupt();
-			throw new RuntimeException("Interrupted while waiting for loadStep to complete", e);
-		}
+
 		List<PanelDetails> allSteps = new ArrayList<>();
 		allSteps.add(new PanelDetails("Selecting patch types", Arrays.asList(selectingPatchTypeStep)));
-		synchronized (selectedPatches) {
-			for (var patch : selectedPatches.values()) {
-				if (!patch.isInitialized()) {
-					// this means `loadStep` didn't have any selected patches
-					// but still tried to load a selected patch step!
-					assert false : "Patch is not initialized";
-					continue;
-				}
-				var panel = patch.getPanelDetails();
-				// TODO: setDisplayCondition
-				panel.setDisplayCondition(herbPatchSelected);
-				allSteps.add(panel);
+
+		for (var patch : selectedPatches.values()) {
+			if (!patch.isInitialized()) {
+				// this means `loadStep` didn't have any selected patches
+				// but still tried to load a selected patch step!
+				assert false : "Patch is not initialized";
+				continue;
 			}
+			var panel = patch.getPanelDetails();
+			// TODO: setDisplayCondition
+			panel.setDisplayCondition(herbPatchSelected);
+			allSteps.add(panel);
 		}
+
 		return allSteps;
 	}
 
@@ -413,21 +398,21 @@ public class HerbRun extends ComplexStateQuestHelper {
 		if (patchSelectionTest == null || patchSelectionTest.isEmpty()) {
 			bPatchesSelected = false;
 		} else {
-			synchronized (selectedPatches) {
-				var patches = parsePatchImplementations(patchSelectionTest);
-				FarmRunBuilder builder = FarmRunBuilder.builder()
-						.withQuestHelper(this)
-						.withFarmingHandler(farmingHandler)
-						.withFarmingWorld(farmingWorld)
-						.withEventBus(eventBus);
 
-				patches.forEach(patch -> {
-					builder.withPatchImplementation(patch);
-					selectedPatches.putIfAbsent(patch, builder.build());
-				});
+			var patches = parsePatchImplementations(patchSelectionTest);
+			FarmRunBuilder builder = FarmRunBuilder.builder()
+					.withQuestHelper(this)
+					.withFarmingHandler(farmingHandler)
+					.withFarmingWorld(farmingWorld)
+					.withEventBus(eventBus);
 
-				bPatchesSelected = selectedPatches.size() > 0;
-			}
+			patches.forEach(patch -> {
+				builder.withPatchImplementation(patch);
+				selectedPatches.putIfAbsent(patch, builder.build());
+			});
+
+			bPatchesSelected = selectedPatches.size() > 0;
+
 		}
 		step = loadStep();
 		this.config = helperConfig;
@@ -439,9 +424,9 @@ public class HerbRun extends ComplexStateQuestHelper {
 
 	@Override
 	public void shutDown() {
-		selectedPatches.forEachValue(var, patch -> {
-			patch.shutDown();
-			eventBus.unregister(patch);
+		selectedPatches.values().forEach(farmRun -> {
+			farmRun.shutDown();
+			eventBus.unregister(farmRun);
 		});
 		selectedPatches.clear();
 	}
