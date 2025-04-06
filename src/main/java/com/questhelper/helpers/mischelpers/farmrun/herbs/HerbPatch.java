@@ -140,7 +140,7 @@ public enum HerbPatch implements FarmingPatchRequirements {
                                 harvestStep = new ObjectStep(
                                                 questHelper,
                                                 NullObjectID.NULL_18816,
-                                                new WorldPoint(3605, 3529, 0),
+                                                new WorldPoint(826, 3694, 0),
                                                 "Harvest your herbs from the Troll Stronghold patch.",
                                                 trollheimTeleport, stonyBasalt);
                                 conditionsToHide.add(getConditionsToHideRequirement());
@@ -242,7 +242,7 @@ public enum HerbPatch implements FarmingPatchRequirements {
                                 plantStep = new ObjectStep(
                                                 questHelper,
                                                 NullObjectID.NULL_18816,
-                                                new WorldPoint(3605, 3529, 0),
+                                                new WorldPoint(826, 3694, 0),
                                                 "Plant your seeds into the Troll Stronghold patch.",
                                                 trollheimTeleport, stonyBasalt);
                                 conditionsToHide.add(getConditionsToHideRequirement());
