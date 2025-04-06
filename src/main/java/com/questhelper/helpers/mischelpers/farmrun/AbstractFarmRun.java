@@ -6,22 +6,35 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 
+import com.questhelper.QuestHelperConfig;
 import com.questhelper.collections.ItemCollections;
 import com.questhelper.config.ConfigKeys;
 import com.questhelper.helpers.mischelpers.farmrun.utils.FarmingHandler;
+import com.questhelper.helpers.mischelpers.farmrun.utils.FarmingPatch;
+import com.questhelper.helpers.mischelpers.farmrun.utils.FarmingPatchRequirements;
 import com.questhelper.helpers.mischelpers.farmrun.utils.FarmingWorld;
+import com.questhelper.managers.ItemAndLastUpdated;
+import com.questhelper.managers.QuestContainerManager;
 import com.questhelper.panel.PanelDetails;
 import com.questhelper.questhelpers.QuestHelper;
+import com.questhelper.requirements.Requirement;
+import com.questhelper.requirements.conditional.Conditions;
 import com.questhelper.requirements.item.ItemRequirement;
 import com.questhelper.requirements.runelite.RuneliteRequirement;
+import com.questhelper.requirements.util.LogicType;
 import com.questhelper.requirements.var.VarbitRequirement;
 import com.questhelper.steps.ConditionalStep;
+import com.questhelper.steps.DetailedQuestStep;
 import com.questhelper.steps.QuestStep;
 
 import net.runelite.api.ItemID;
 import net.runelite.api.Varbits;
 import net.runelite.api.events.GameTick;
+import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
+import net.runelite.client.plugins.timetracking.Tab;
+import net.runelite.client.plugins.timetracking.farming.CropState;
+import net.runelite.client.util.Text;
 
 public abstract class AbstractFarmRun extends QuestStep {
 
@@ -36,12 +49,33 @@ public abstract class AbstractFarmRun extends QuestStep {
     private final HashSet<ItemRequirement> alwaysRequiredItems = new HashSet<>();
     private final HashSet<ItemRequirement> alwaysRecommendedItems = new HashSet<>();
 
-    public AbstractFarmRun(QuestHelper questHelper, FarmingWorld farmingWorld, FarmingHandler farmingHandler) {
+    private ItemRequirement seedItemRequirement;
+    private List<Requirement> patchRequirements = new ArrayList<>();
+
+    private boolean initialized = false;
+
+    private ConditionalStep step;
+    private DetailedQuestStep waitForGrowthStep;
+
+    private String growthStepText = "Wait for the crops to grow.";
+    private String seedsRequirementText = "Seeds";
+
+    private String configKey = "";
+
+    private PanelDetails panelDetails;
+
+    private Tab timeTrackingTab;
+
+    public AbstractFarmRun(QuestHelper questHelper, FarmingWorld farmingWorld, FarmingHandler farmingHandler,
+            String configKey, Tab tab) {
         super(questHelper);
         this.farmingWorld = farmingWorld;
         this.farmingHandler = farmingHandler;
         this.client = questHelper.getQuestHelperPlugin().getClient();
         this.clientThread = questHelper.getQuestHelperPlugin().getClientThread();
+        this.configKey = configKey;
+        assert this.configKey != null && !this.configKey.isEmpty() : "Config key cannot be null or empty";
+        this.timeTrackingTab = tab;
         requiredItems = new HashSet<>();
         recommendedItems = new HashSet<>();
         compostItemRequirement.setDisplayMatchedItemName(true);
@@ -57,25 +91,139 @@ public abstract class AbstractFarmRun extends QuestStep {
         alwaysRecommendedItems.add(new ItemRequirement("Magic secateurs", ItemID.MAGIC_SECATEURS));
     }
 
-    public abstract boolean isInitialized();
+    public boolean isInitialized() {
+        return initialized;
+    }
 
     protected FarmingWorld farmingWorld;
 
     protected FarmingHandler farmingHandler;
 
-    protected abstract ConditionalStep loadStep();
+    public ConditionalStep loadStep() {
+        setupConditions();
+        setupSteps();
+        addSteps();
+        this.initialized = true;
+        return step;
+    }
 
-    protected abstract void setupConditions();
+    private void setupConditions() {
+        var configManager = questHelper.getConfigManager();
+        this.seedItemRequirement = new ItemRequirement(this.seedsRequirementText, ItemID.POTATO_SEED);
+        String seedName = configManager.getRSProfileConfiguration(QuestHelperConfig.QUEST_BACKGROUND_GROUP,
+                this.configKey);
 
-    protected abstract void setupSteps();
+        if (seedName != null) {
+            this.seedItemRequirement.setId(getSeedID(seedName));
+            this.seedItemRequirement.setName(Text.titleCase(getSeedEnum(seedName)) + " seed");
+        }
 
-    protected abstract void addSteps();
+        addRequiredItems(this.seedItemRequirement);
+    }
 
-    protected abstract PanelDetails getPanelDetails();
+    private void setupSteps() {
+        this.waitForGrowthStep = new DetailedQuestStep(questHelper, this.growthStepText);
 
-    protected abstract void onGameTick(GameTick event);
+        this.step = new ConditionalStep(questHelper, this.waitForGrowthStep);
+    }
 
-    protected abstract void onConfigChanged(ConfigChanged event);
+    private void addSteps() {
+        for (FarmingPatchRequirements patch : getPatches()) {
+            var ready = patch.getPatchReadyRequirement();
+            var harvestStep = patch.getHarvestStep(questHelper);
+            if (harvestStep == null)
+                continue;
+
+            step.addStep(ready, harvestStep);
+            var plantStep = patch.getPlantStep(questHelper);
+            step.addStep(patch.getPatchEmptyRequirement(), plantStep);
+            addRecommendedItems(patch.getPatchItemRecommendations());
+
+            patchRequirements.add(ready);
+            patchRequirements.add(patch.getPatchEmptyRequirement());
+        }
+        this.waitForGrowthStep.conditionToHideInSidebar(new Conditions(LogicType.OR, patchRequirements));
+    }
+
+    public PanelDetails getPanelDetails() {
+        if (this.panelDetails != null) {
+            return this.panelDetails;
+        }
+        this.panelDetails = new PanelDetails(getPanelTitle(), List.copyOf(step.getSteps()));
+
+        return this.panelDetails;
+    }
+
+    @Subscribe
+    public void onGameTick(GameTick event) {
+        if (!this.initialized)
+            return;
+        int seedsNeeded = 0;
+        var patches = getPatches();
+        for (FarmingPatch patch : farmingWorld.getTabs().get(timeTrackingTab)) {
+            CropState state = farmingHandler.predictPatch(patch);
+            boolean isHarvestable = state == CropState.HARVESTABLE;
+            boolean isPlantable = state == CropState.EMPTY || state == CropState.DEAD ||
+                    state == null;
+
+            if (isHarvestable || isPlantable) {
+                ++seedsNeeded;
+            }
+
+            FarmingPatchRequirements patchRequirements = getPatchRequirements(patch);
+
+            int activePatchIndex = patches.indexOf(patchRequirements);
+            if (activePatchIndex == -1) {
+                --seedsNeeded;
+                continue;
+            }
+            Requirement hideCondition = patches.get(activePatchIndex).getConditionsToHideRequirement();
+            if (hideCondition != null) {
+                if (hideCondition.check(client)) {
+                    --seedsNeeded;
+                    continue;
+                }
+            }
+            patches.get(activePatchIndex).setPatchHarvestable(isHarvestable);
+            patches.get(activePatchIndex).setPatchPlantable(isPlantable);
+        }
+        seedItemRequirement.setQuantity(seedsNeeded);
+        setRequiredCompostQuantity(seedsNeeded);
+    }
+
+    @Subscribe
+    public void onConfigChanged(ConfigChanged event) {
+        if (!event.getGroup().equals(QuestHelperConfig.QUEST_BACKGROUND_GROUP))
+            return;
+        if (event.getKey().equals(this.configKey)) {
+            String seedName = event.getNewValue();
+            if (seedName == null || seedName.isEmpty()) {
+                return;
+            }
+            Enum<?> seedEnum = getSeedEnum(seedName);
+            if (seedEnum == null) {
+                return;
+            }
+            seedItemRequirement.setId(getSeedID(seedName));
+            seedItemRequirement.setName(Text.titleCase(seedEnum) + " seed");
+            questHelper.getQuestHelperPlugin().refreshBank();
+            questHelper.getQuestHelperPlugin().getClientThread().invokeLater(() -> {
+                // force the inventory requirements to update.
+                ItemAndLastUpdated inventoryData = QuestContainerManager.getInventoryData();
+                inventoryData.update(inventoryData.getLastUpdated() + 1, inventoryData.getItems());
+            });
+        }
+    }
+
+    protected abstract int getSeedID(String seedName);
+
+    protected abstract Enum<?> getSeedEnum(String seedName);
+
+    protected abstract List<FarmingPatchRequirements> getPatches();
+
+    protected abstract FarmingPatchRequirements getPatchRequirements(FarmingPatch patch);
+
+    protected abstract String getPanelTitle();
 
     protected void setRecommended(ItemRequirement... items) {
         this.recommendedItems.clear();
@@ -123,5 +271,17 @@ public abstract class AbstractFarmRun extends QuestStep {
 
     protected void setRequiredCompostQuantity(int quantity) {
         compostItemRequirement.quantity(quantity);
+    }
+
+    protected void setGrowthStepText(String text) {
+        this.growthStepText = text;
+    }
+
+    protected void setSeedItemRequirementText(String text) {
+        this.seedsRequirementText = text;
+    }
+
+    protected void setTimeTrackingTab(Tab tab) {
+        this.timeTrackingTab = tab;
     }
 }
