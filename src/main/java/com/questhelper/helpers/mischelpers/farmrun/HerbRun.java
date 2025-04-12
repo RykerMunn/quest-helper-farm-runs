@@ -107,8 +107,7 @@ public class HerbRun extends ComplexStateQuestHelper {
 		// based on the order of selected patches.
 		ConditionalStep steps = new ConditionalStep(this, selectingPatchTypeStep);
 
-		for (var patchType : selectedPatches) {
-			var patch = allPatches.get(patchType);
+		for (var patch : allPatches.values()) {
 			var questStep = patch.loadStep();
 			steps.addStep(patch.getConditionToHide(), questStep);
 		}
@@ -189,7 +188,7 @@ public class HerbRun extends ComplexStateQuestHelper {
 		for (PatchImplementation availablePatch : PatchImplementation.values()) {
 			builder.withPatchImplementation(availablePatch)
 					.withHideCondition(client -> {
-						return !this.selectedPatches.contains(availablePatch);
+						return this.selectedPatches.contains(availablePatch);
 					});
 			AbstractFarmRun farmRun = builder.build();
 			if (farmRun == null) {
@@ -226,6 +225,12 @@ public class HerbRun extends ComplexStateQuestHelper {
 				bPatchesSelected = selectedPatches.size() > 0;
 
 				seedsConfig.refresh(questHelperPlugin.getConfigManager());
+				questHelperPlugin.getClientThread().invokeLater(() -> {
+					// force the inventory requirements to update.
+					ItemAndLastUpdated inventoryData = QuestContainerManager.getInventoryData();
+					inventoryData.update(inventoryData.getLastUpdated() + 1, inventoryData.getItems());
+				});
+				questHelperPlugin.refreshBank();
 			}
 		}
 	}

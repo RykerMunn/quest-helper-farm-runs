@@ -104,8 +104,8 @@ public final class FarmRunBuilder {
                 farmRun = new FlowerRun(questHelper, farmingWorld, farmingHandler);
                 break;
             default:
-                assert false : "No implementation found for " + patchImplementation;
-                break;
+                // No implementation found, return null
+                return null;
         }
 
         if (eventBus != null && farmRun != null) {

@@ -22,6 +22,7 @@ import com.questhelper.requirements.conditional.Conditions;
 import com.questhelper.requirements.item.ItemRequirement;
 import com.questhelper.requirements.runelite.RuneliteRequirement;
 import com.questhelper.requirements.util.LogicType;
+import com.questhelper.requirements.util.RequirementBuilder;
 import com.questhelper.requirements.var.VarbitRequirement;
 import com.questhelper.steps.ConditionalStep;
 import com.questhelper.steps.DetailedQuestStep;
@@ -293,5 +294,10 @@ public abstract class AbstractFarmRun extends QuestStep {
 
     protected void setTimeTrackingTab(Tab tab) {
         this.timeTrackingTab = tab;
+    }
+
+    protected void setSeedItemRequirementShowConditioned(Requirement condition) {
+        // TODO: Build condition for item requirements so tht they only show
+        // when the appropriate patch is selected.
     }
 }
