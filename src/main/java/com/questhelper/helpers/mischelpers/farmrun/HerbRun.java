@@ -79,7 +79,8 @@ public class HerbRun extends ComplexStateQuestHelper {
 
 	private FarmingHandler farmingHandler;
 	private boolean bPatchesSelected = false;
-	private HashMap<PatchImplementation, AbstractFarmRun> selectedPatches = new HashMap<>();
+	private HashSet<PatchImplementation> selectedPatches = new HashSet<>();
+	private HashMap<PatchImplementation, AbstractFarmRun> allPatches = new HashMap<>();
 
 	private HashSet<ItemRequirement> allRequiredItems = new HashSet<>();
 	private HashSet<ItemRequirement> allRecommendedItems = new HashSet<>();
@@ -108,10 +109,13 @@ public class HerbRun extends ComplexStateQuestHelper {
 		setupConditions();
 		setupSteps();
 
-		// when no other step condition is met, `waitForHerbs` is the default step.
+		// If no patches are selected, show the patch selection step.
+		// Else the first step that is shown is the first available step
+		// based on the order of selected patches.
 		ConditionalStep steps = new ConditionalStep(this, selectingPatchTypeStep);
 
-		for (var patch : selectedPatches.values()) {
+		for (var patchType : selectedPatches) {
+			var patch = allPatches.get(patchType);
 			var questStep = patch.loadStep();
 			steps.addStep(patch.getConditionToHide(), questStep);
 		}
@@ -252,6 +256,23 @@ public class HerbRun extends ComplexStateQuestHelper {
 
 		selectingPatchTypeStep = new DetailedQuestStep(this,
 				"Select the patch types in the configuration section to see detailed requirements.");
+
+		FarmRunBuilder builder = FarmRunBuilder.builder()
+				.withQuestHelper(this)
+				.withFarmingHandler(farmingHandler)
+				.withFarmingWorld(farmingWorld)
+				.withEventBus(eventBus);
+		for (PatchImplementation availablePatch : PatchImplementation.values()) {
+			builder.withPatchImplementation(availablePatch)
+					.withHideCondition(client -> {
+						return !this.selectedPatches.contains(availablePatch);
+					});
+			AbstractFarmRun farmRun = builder.build();
+			if (farmRun == null) {
+				continue;
+			}
+			allPatches.putIfAbsent(availablePatch, farmRun);
+		}
 	}
 
 	@Subscribe
@@ -274,26 +295,13 @@ public class HerbRun extends ComplexStateQuestHelper {
 			if (valueTest != null && !valueTest.isEmpty()) {
 				selectedPatches.clear();
 				var patches = parsePatchImplementations(valueTest);
-				// TODO: all patch implementations have to be built and loaded on startup.
-				FarmRunBuilder builder = FarmRunBuilder.builder()
-						.withQuestHelper(this)
-						.withFarmingHandler(farmingHandler)
-						.withFarmingWorld(farmingWorld)
-						.withEventBus(eventBus);
-
 				patches.forEach(patch -> {
-					builder.withPatchImplementation(patch)
-							.withHideCondition(client -> {
-								return this.selectedPatches.containsKey(patch);
-							});
-
-					selectedPatches.putIfAbsent(patch, builder.build());
+					selectedPatches.add(patch);
 				});
 
 				bPatchesSelected = selectedPatches.size() > 0;
 
 				seedsConfig.refresh(questHelperPlugin.getConfigManager());
-
 			}
 		}
 	}
@@ -302,7 +310,8 @@ public class HerbRun extends ComplexStateQuestHelper {
 	public List<ItemRequirement> getItemRequirements() {
 		allRequiredItems.clear();
 		if (bPatchesSelected) {
-			for (var patch : selectedPatches.values()) {
+			for (var patchType : selectedPatches) {
+				var patch = allPatches.get(patchType);
 				List<ItemRequirement> orderedItems = patch.getRequiredItems();
 				allRequiredItems.addAll(orderedItems);
 			}
@@ -311,7 +320,8 @@ public class HerbRun extends ComplexStateQuestHelper {
 		allRequiredItems.add(gracefulOutfit);
 		var list = new ArrayList<>(allRequiredItems);
 		list.sort(Comparator.comparingInt(item -> {
-			for (var patch : selectedPatches.values()) {
+			for (var patchType : selectedPatches) {
+				var patch = allPatches.get(patchType);
 				List<ItemRequirement> orderedItems = patch.getRequiredItems();
 				int index = orderedItems.indexOf(item);
 				if (index != -1) {
@@ -327,14 +337,16 @@ public class HerbRun extends ComplexStateQuestHelper {
 	public List<ItemRequirement> getItemRecommended() {
 		allRecommendedItems.clear();
 		if (bPatchesSelected) {
-			for (var patch : selectedPatches.values()) {
+			for (var patchType : selectedPatches) {
+				var patch = allPatches.get(patchType);
 				List<ItemRequirement> orderedItems = patch.getRecommendedItems();
 				allRecommendedItems.addAll(orderedItems);
 			}
 		}
 		var list = new ArrayList<>(allRecommendedItems);
 		list.sort(Comparator.comparingInt(item -> {
-			for (var patch : selectedPatches.values()) {
+			for (var patchType : selectedPatches) {
+				var patch = allPatches.get(patchType);
 				List<ItemRequirement> orderedItems = patch.getRecommendedItems();
 				int index = orderedItems.indexOf(item);
 				if (index != -1) {
@@ -350,7 +362,7 @@ public class HerbRun extends ComplexStateQuestHelper {
 	public List<HelperConfig> getConfigs() {
 		HelperConfig patchConfig = new HelperConfig("Patches", PATCH_SELECTION, PatchImplementation.values());
 		patchConfig.setAllowMultiple(true);
-		seedsConfig = new SeedsHelperConfig(farmingSeedFactory, "Seeds", selectedPatches.keySet());
+		seedsConfig = new SeedsHelperConfig(farmingSeedFactory, "Seeds", selectedPatches);
 		HelperConfig outfitConfig = new HelperConfig("Outfit", GRACEFUL_OR_FARMING, GracefulOrFarming.values());
 		return Arrays.asList(patchConfig, seedsConfig, outfitConfig);
 	}
@@ -361,14 +373,15 @@ public class HerbRun extends ComplexStateQuestHelper {
 		List<PanelDetails> allSteps = new ArrayList<>();
 		allSteps.add(new PanelDetails("Selecting patch types", Arrays.asList(selectingPatchTypeStep)));
 
-		for (var patch : selectedPatches.values()) {
+		for (var patchKey : selectedPatches) {
+			var patch = allPatches.get(patchKey);
 			if (!patch.isInitialized()) {
 				// this means `loadStep` didn't have any selected patches
 				// but still tried to load a selected patch step!
 				assert false : "Patch is not initialized";
 				continue;
 			}
-			var panel = patch.getPanelDetails();			
+			var panel = patch.getPanelDetails();
 			panel.setDisplayCondition(patch.getConditionToHide());
 			allSteps.add(panel);
 		}
@@ -384,25 +397,11 @@ public class HerbRun extends ComplexStateQuestHelper {
 		if (patchSelectionTest == null || patchSelectionTest.isEmpty()) {
 			bPatchesSelected = false;
 		} else {
-
 			var patches = parsePatchImplementations(patchSelectionTest);
-			// TODO: all patch implementations have to be built and loaded on startup.
-			FarmRunBuilder builder = FarmRunBuilder.builder()
-					.withQuestHelper(this)
-					.withFarmingHandler(farmingHandler)
-					.withFarmingWorld(farmingWorld)
-					.withEventBus(eventBus);
-
 			patches.forEach(patch -> {
-				builder.withPatchImplementation(patch)
-						.withHideCondition(client -> {
-							return this.selectedPatches.containsKey(patch);
-						});
-				selectedPatches.putIfAbsent(patch, builder.build());
+				selectedPatches.add(patch);
 			});
-
 			bPatchesSelected = selectedPatches.size() > 0;
-
 		}
 		step = loadStep();
 		this.config = helperConfig;
@@ -414,11 +413,15 @@ public class HerbRun extends ComplexStateQuestHelper {
 
 	@Override
 	public void shutDown() {
-		selectedPatches.values().forEach(farmRun -> {
+		allPatches.values().forEach(farmRun -> {
 			farmRun.shutDown();
 			eventBus.unregister(farmRun);
 		});
 		selectedPatches.clear();
+		allPatches.clear();
+		allRequiredItems.clear();
+		allRecommendedItems.clear();
+		bPatchesSelected = false;
 	}
 
 	private List<PatchImplementation> parsePatchImplementations(String str) {
