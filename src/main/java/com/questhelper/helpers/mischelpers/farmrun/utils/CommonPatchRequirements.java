@@ -8,9 +8,9 @@ import com.questhelper.requirements.player.SkillRequirement;
 import com.questhelper.requirements.quest.QuestRequirement;
 import com.questhelper.requirements.util.LogicType;
 
-import net.runelite.api.ItemID;
 import net.runelite.api.QuestState;
 import net.runelite.api.Skill;
+import net.runelite.api.gameval.ItemID;
 
 public class CommonPatchRequirements {
 
@@ -19,10 +19,10 @@ public class CommonPatchRequirements {
     }
 
     public static ItemRequirement getArdougneCloak(boolean withAlternates) {
-        ItemRequirement ardougneCloak = new ItemRequirement("Ardogune Cloak 2+", ItemID.ARDOUGNE_CLOAK_2)
+        ItemRequirement ardougneCloak = new ItemRequirement("Ardogune Cloak 2+", ItemID.ARDY_CAPE_MEDIUM)
                 .showConditioned(new QuestRequirement(QuestHelperQuest.ARDOUGNE_MEDIUM, QuestState.FINISHED));
         if (withAlternates) {
-            ardougneCloak.addAlternates(ItemID.ARDOUGNE_CLOAK_3, ItemID.ARDOUGNE_CLOAK_4);
+            ardougneCloak.addAlternates(ItemID.ARDY_CAPE_HARD, ItemID.ARDY_CAPE_ELITE);
         }
 
         ardougneCloak.setTooltip(null);
@@ -32,20 +32,20 @@ public class CommonPatchRequirements {
     public static ItemRequirements getCatherybyTeleport() {
         ItemRequirements catherbyRunes = new ItemRequirements(
                 "Runes for Catherby Teleport",
-                new ItemRequirement("Water rune", ItemID.WATER_RUNE, 10),
-                new ItemRequirement("Law rune", ItemID.LAW_RUNE, 3),
-                new ItemRequirement("Astral rune", ItemID.ASTRAL_RUNE, 3));
+                new ItemRequirement("Water rune", ItemID.WATERRUNE, 10),
+                new ItemRequirement("Law rune", ItemID.LAWRUNE, 3),
+                new ItemRequirement("Astral rune", ItemID.ASTRALRUNE, 3));
 
         catherbyRunes.showConditioned(new SkillRequirement(Skill.MAGIC, 87));
         catherbyRunes.showConditioned(new QuestRequirement(QuestHelperQuest.LUNAR_DIPLOMACY, QuestState.FINISHED));
 
-        ItemRequirement catherbyTablet = new ItemRequirement("Catherby tablet", ItemID.CATHERBY_TELEPORT);
+        ItemRequirement catherbyTablet = new ItemRequirement("Catherby tablet", ItemID.LUNAR_TABLET_CATHERBY_TELEPORT);
         ItemRequirement camelotRunes = new ItemRequirements(
                 "Runes for Camelot Teleport",
-                new ItemRequirement("Law rune", ItemID.LAW_RUNE),
-                new ItemRequirement("Air rune", ItemID.AIR_RUNE, 5));
+                new ItemRequirement("Law rune", ItemID.LAWRUNE),
+                new ItemRequirement("Air rune", ItemID.AIRRUNE, 5));
 
-        ItemRequirement camelotTablet = new ItemRequirement("Camelot teleport", ItemID.CAMELOT_TELEPORT);
+        ItemRequirement camelotTablet = new ItemRequirement("Camelot teleport", ItemID.POH_TABLET_CAMELOTTELEPORT);
         camelotRunes.showConditioned(new SkillRequirement(Skill.MAGIC, 45));
 
         ItemRequirements catherybyTeleport = new ItemRequirements(LogicType.OR, "Catherby Teleport", catherbyRunes,
@@ -62,10 +62,10 @@ public class CommonPatchRequirements {
     }
 
     public static ItemRequirement getExplorerRing(boolean withAlternates) {
-        ItemRequirement explorerRing = new ItemRequirement("Explorer's Ring", ItemID.EXPLORERS_RING_2)
+        ItemRequirement explorerRing = new ItemRequirement("Explorer's Ring", ItemID.LUMBRIDGE_RING_MEDIUM)
                 .showConditioned(new QuestRequirement(QuestHelperQuest.LUMBRIDGE_MEDIUM, QuestState.FINISHED));
         if (withAlternates) {
-            explorerRing.addAlternates(ItemID.EXPLORERS_RING_3, ItemID.EXPLORERS_RING_4);
+            explorerRing.addAlternates(ItemID.LUMBRIDGE_RING_HARD, ItemID.LUMBRIDGE_RING_ELITE);
         }
         return explorerRing;
     }
@@ -73,9 +73,9 @@ public class CommonPatchRequirements {
     public static ItemRequirement getFarmingGuildTeleport() {
         ItemRequirement farmingGuildTeleport = new ItemRequirement(
                 "Farming guild teleport (Skills' Necklace or CIR fairy ring)",
-                ItemID.FARMING_CAPET);
+                ItemID.SKILLCAPE_FARMING_TRIMMED);
 
-        farmingGuildTeleport.addAlternates(ItemID.FARMING_CAPE);
+        farmingGuildTeleport.addAlternates(ItemID.SKILLCAPE_FARMING);
         farmingGuildTeleport.addAlternates(ItemCollections.SKILLS_NECKLACES);
         farmingGuildTeleport.addAlternates(ItemCollections.FAIRY_STAFF);
 
@@ -90,7 +90,7 @@ public class CommonPatchRequirements {
         ItemRequirement ectophial = new ItemRequirement("Ectophial", ItemID.ECTOPHIAL)
                 .showConditioned(new QuestRequirement(QuestHelperQuest.GHOSTS_AHOY, QuestState.FINISHED));
 
-        ectophial.addAlternates(ItemID.ECTOPHIAL_4252);
+        ectophial.addAlternates(ItemID.ECTOPHIAL_EMPTY);
         ectophial.setTooltip(null);
         return ectophial;
     }
@@ -100,13 +100,13 @@ public class CommonPatchRequirements {
 
         ItemRequirement harmonyIslandRunes = new ItemRequirements(
                 "Runes for Harmony Island Teleport",
-                new ItemRequirement("Nature rune", ItemID.NATURE_RUNE, 1),
-                new ItemRequirement("Law rune", ItemID.LAW_RUNE, 1),
-                new ItemRequirement("Soul rune", ItemID.SOUL_RUNE, 1));
+                new ItemRequirement("Nature rune", ItemID.NATURERUNE, 1),
+                new ItemRequirement("Law rune", ItemID.LAWRUNE, 1),
+                new ItemRequirement("Soul rune", ItemID.SOULRUNE, 1));
         harmonyIslandRunes.showConditioned(new SkillRequirement(Skill.MAGIC, 65));
 
         ItemRequirement harmonyIslandTable = new ItemRequirement("Harmony Island teleport",
-                ItemID.HARMONY_ISLAND_TELEPORT);
+                ItemID.TELETAB_HARMONY);
 
         ItemRequirements harmonyTeleport = new ItemRequirements(LogicType.OR, "Harmony Island Teleport", ectophial,
                 harmonyIslandRunes, harmonyIslandTable);
@@ -117,14 +117,14 @@ public class CommonPatchRequirements {
     }
 
     public static ItemRequirement getXericsTalisman() {
-        return new ItemRequirement("Xeric's talisman", ItemID.XERICS_TALISMAN);
+        return new ItemRequirement("Xeric's talisman", ItemID.XERIC_TALISMAN);
     }
 
     public static ItemRequirement getHosidiusTeleport() {
         ItemRequirement hosidiusHouseTeleport = new ItemRequirement(
                 "Teleport to Hosidius House (Tablet or Xeric's Talisman)",
-                ItemID.HOSIDIUS_TELEPORT);
-        hosidiusHouseTeleport.addAlternates(ItemID.XERICS_TALISMAN);
+                ItemID.NZONE_TELETAB_KOUREND);
+        hosidiusHouseTeleport.addAlternates(ItemID.XERIC_TALISMAN);
         return hosidiusHouseTeleport;
     }
 
@@ -133,10 +133,10 @@ public class CommonPatchRequirements {
     }
 
     public static ItemRequirement getHunterWhistle() {
-        ItemRequirement hunterWhistle = new ItemRequirement("Quetzal whistle", ItemID.PERFECTED_QUETZAL_WHISTLE)
+        ItemRequirement hunterWhistle = new ItemRequirement("Quetzal whistle", ItemID.HG_QUETZALWHISTLE_PERFECTED)
                 .showConditioned(getVarlamoreAccess());
-        hunterWhistle.addAlternates(ItemID.BASIC_QUETZAL_WHISTLE);
-        hunterWhistle.addAlternates(ItemID.ENHANCED_QUETZAL_WHISTLE);
+        hunterWhistle.addAlternates(ItemID.HG_QUETZALWHISTLE_BASIC);
+        hunterWhistle.addAlternates(ItemID.HG_QUETZALWHISTLE_ENHANCED);
         return hunterWhistle;
     }
 
@@ -148,15 +148,15 @@ public class CommonPatchRequirements {
         // teleport crystal or house teleport / redirect tab
         ItemRequirement teleportCrystal = new ItemRequirement("Teleport crystal", ItemCollections.TELEPORT_CRYSTAL);
 
-        ItemRequirement prifddinasTablet = new ItemRequirement("Prifddinas teleport", ItemID.PRIFDDINAS_TELEPORT);
-        ItemRequirement houseTeleport = new ItemRequirement("House teleport", ItemID.TELEPORT_TO_HOUSE);
-        houseTeleport.addAlternates(ItemID.CONSTRUCT_CAPE, ItemID.CONSTRUCT_CAPET);
+        ItemRequirement prifddinasTablet = new ItemRequirement("Prifddinas teleport", ItemID.PRIF_TELEPORT_CRYSTAL);
+        ItemRequirement houseTeleport = new ItemRequirement("House teleport", ItemID.POH_TABLET_TELEPORTTOHOUSE);
+        houseTeleport.addAlternates(ItemID.SKILLCAPE_CONSTRUCTION, ItemID.SKILLCAPE_CONSTRUCTION_TRIMMED);
 
         ItemRequirement houseTeleportRunes = new ItemRequirements(
                 "Runes for House Teleport",
-                new ItemRequirement("Law rune", ItemID.LAW_RUNE),
-                new ItemRequirement("Air rune", ItemID.AIR_RUNE, 1),
-                new ItemRequirement("Earth rune", ItemID.EARTH_RUNE, 1));
+                new ItemRequirement("Law rune", ItemID.LAWRUNE),
+                new ItemRequirement("Air rune", ItemID.AIRRUNE, 1),
+                new ItemRequirement("Earth rune", ItemID.EARTHRUNE, 1));
 
         houseTeleportRunes.showConditioned(new SkillRequirement(Skill.MAGIC, 40));
 

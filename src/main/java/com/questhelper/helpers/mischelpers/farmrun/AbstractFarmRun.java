@@ -30,9 +30,9 @@ import com.questhelper.steps.QuestStep;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.AccessLevel;
-import net.runelite.api.ItemID;
-import net.runelite.api.Varbits;
 import net.runelite.api.events.GameTick;
+import net.runelite.api.gameval.ItemID;
+import net.runelite.api.gameval.VarbitID;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.timetracking.Tab;
@@ -93,16 +93,16 @@ public abstract class AbstractFarmRun extends QuestStep {
         requiredItems = new HashSet<>();
         recommendedItems = new HashSet<>();
         compostItemRequirement.setDisplayMatchedItemName(true);
-        alwaysRequiredItems.add(new ItemRequirement("Seed dibber", ItemID.SEED_DIBBER)
+        alwaysRequiredItems.add(new ItemRequirement("Seed dibber", ItemID.DIBBER)
                 .hideConditioned(new RuneliteRequirement(questHelper.getConfigManager(),
                         ConfigKeys.BARBARIAN_TRAINING_FINISHED_SEED_PLANTING.getKey(), "true",
                         "Completed the Barbarian bare-handed farming training.")));
         alwaysRequiredItems.add(new ItemRequirement("Spade", ItemID.SPADE));
         alwaysRequiredItems.add(new ItemRequirement("Rake", ItemID.RAKE)
-                .hideConditioned(new VarbitRequirement(Varbits.AUTOWEED, 2)));
+                .hideConditioned(new VarbitRequirement(VarbitID.FARMING_BLOCKWEEDS, 2)));
         alwaysRequiredItems.add(compostItemRequirement);
 
-        alwaysRecommendedItems.add(new ItemRequirement("Magic secateurs", ItemID.MAGIC_SECATEURS));
+        alwaysRecommendedItems.add(new ItemRequirement("Magic secateurs", ItemID.FAIRY_ENCHANTED_SECATEURS));
     }
 
     public boolean isInitialized() {

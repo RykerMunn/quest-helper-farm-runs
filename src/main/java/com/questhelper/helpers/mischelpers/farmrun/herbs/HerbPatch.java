@@ -17,10 +17,10 @@ import com.questhelper.requirements.util.LogicType;
 import com.questhelper.steps.ObjectStep;
 import com.questhelper.steps.QuestStep;
 
-import net.runelite.api.ItemID;
-import net.runelite.api.NullObjectID;
 import net.runelite.api.QuestState;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.gameval.ItemID;
+import net.runelite.api.gameval.ObjectID;
 
 public enum HerbPatch implements FarmingPatchRequirements {
         UNKNOWN(new ManualRequirement(), new ManualRequirement()),
@@ -41,21 +41,22 @@ public enum HerbPatch implements FarmingPatchRequirements {
 
         private final ItemRequirement trollheimRunes = new ItemRequirements("Trollheim teleport runes",
                         new ItemRequirement("Law rune",
-                                        ItemID.LAW_RUNE, 2),
-                        new ItemRequirement("Fire rune", ItemID.FIRE_RUNE, 2));
+                                        ItemID.LAWRUNE, 2),
+                        new ItemRequirement("Fire rune", ItemID.FIRERUNE, 2));
         private final ItemRequirement trollheimTablet = new ItemRequirement("Trollheim tablet",
-                        ItemID.TROLLHEIM_TELEPORT);
+                        ItemID.NZONE_TELETAB_TROLLHEIM);
         private final ItemRequirement trollheimTeleport = new ItemRequirements(LogicType.OR, "Trollheim teleport",
                         trollheimRunes, trollheimTablet)
                         .hideConditioned(new QuestRequirement(QuestHelperQuest.MAKING_FRIENDS_WITH_MY_ARM,
                                         QuestState.FINISHED));
 
-        private final ItemRequirement icyBasalt = new ItemRequirement("Icy basalt", ItemID.ICY_BASALT)
+        private final ItemRequirement icyBasalt = new ItemRequirement("Icy basalt", ItemID.WEISS_TELEPORT_BASALT)
                         .showConditioned(
                                         new QuestRequirement(QuestHelperQuest.MAKING_FRIENDS_WITH_MY_ARM,
                                                         QuestState.FINISHED));
 
-        private final ItemRequirement stonyBasalt = new ItemRequirement("Stony basalt", ItemID.STONY_BASALT)
+        private final ItemRequirement stonyBasalt = new ItemRequirement("Stony basalt",
+                        ItemID.STRONGHOLD_TELEPORT_BASALT)
                         .showConditioned(
                                         new QuestRequirement(QuestHelperQuest.MAKING_FRIENDS_WITH_MY_ARM,
                                                         QuestState.FINISHED));
@@ -89,7 +90,7 @@ public enum HerbPatch implements FarmingPatchRequirements {
                         case ARDOUGNE:
                                 harvestStep = new ObjectStep(
                                                 questHelper,
-                                                NullObjectID.NULL_8152,
+                                                ObjectID.FARMING_HERB_PATCH_3,
                                                 new WorldPoint(2670, 3374, 0),
                                                 "Harvest your herbs from the Ardougne patch.",
                                                 CommonPatchRequirements.getArdougneCloak());
@@ -97,7 +98,7 @@ public enum HerbPatch implements FarmingPatchRequirements {
                         case CATHERBY:
                                 harvestStep = new ObjectStep(
                                                 questHelper,
-                                                NullObjectID.NULL_8151,
+                                                ObjectID.FARMING_HERB_PATCH_2,
                                                 new WorldPoint(2813, 3463, 0),
                                                 "Harvest your herbs from the Catherby patch.",
                                                 CommonPatchRequirements.getCatherybyTeleport());
@@ -105,7 +106,7 @@ public enum HerbPatch implements FarmingPatchRequirements {
                         case FALADOR:
                                 harvestStep = new ObjectStep(
                                                 questHelper,
-                                                NullObjectID.NULL_8150,
+                                                ObjectID.FARMING_HERB_PATCH_1,
                                                 new WorldPoint(3058, 3311, 0),
                                                 "Harvest your herbs from the Falador patch.",
                                                 CommonPatchRequirements.getExplorerRing());
@@ -113,7 +114,7 @@ public enum HerbPatch implements FarmingPatchRequirements {
                         case FARMING_GUILD:
                                 harvestStep = new ObjectStep(
                                                 questHelper,
-                                                NullObjectID.NULL_38979,
+                                                ObjectID.FARMING_HERB_PATCH_7,
                                                 new WorldPoint(1238, 3726, 0),
                                                 "Harvest your herbs from the Farming Guild patch.",
                                                 CommonPatchRequirements.getFarmingGuildTeleport());
@@ -123,7 +124,7 @@ public enum HerbPatch implements FarmingPatchRequirements {
                         case HARMONY:
                                 harvestStep = new ObjectStep(
                                                 questHelper,
-                                                NullObjectID.NULL_8153,
+                                                ObjectID.FARMING_HERB_PATCH_5,
                                                 new WorldPoint(3789, 2837, 0),
                                                 "Harvest your herbs from the Harmony patch.",
                                                 CommonPatchRequirements.getHarmonyIslandTeleport());
@@ -132,14 +133,14 @@ public enum HerbPatch implements FarmingPatchRequirements {
                         case MORYTANIA:
                                 harvestStep = new ObjectStep(
                                                 questHelper,
-                                                NullObjectID.NULL_8153,
+                                                ObjectID.FARMING_HERB_PATCH_4,
                                                 new WorldPoint(3605, 3529, 0),
                                                 "Harvest your herbs from the Morytania patch.",
                                                 CommonPatchRequirements.getEctophial());
                         case TROLL_STRONGHOLD:
                                 harvestStep = new ObjectStep(
                                                 questHelper,
-                                                NullObjectID.NULL_18816,
+                                                ObjectID.MYARM_HERBPATCH,
                                                 new WorldPoint(826, 3694, 0),
                                                 "Harvest your herbs from the Troll Stronghold patch.",
                                                 trollheimTeleport, stonyBasalt);
@@ -148,7 +149,7 @@ public enum HerbPatch implements FarmingPatchRequirements {
                         case WEISS:
                                 harvestStep = new ObjectStep(
                                                 questHelper,
-                                                NullObjectID.NULL_33176,
+                                                ObjectID.MY2ARM_HERBPATCH,
                                                 new WorldPoint(2848, 3934, 0),
                                                 "Harvest your herbs from the Weiss patch.",
                                                 icyBasalt);
@@ -157,7 +158,7 @@ public enum HerbPatch implements FarmingPatchRequirements {
                         case KOUREND:
                                 harvestStep = new ObjectStep(
                                                 questHelper,
-                                                NullObjectID.NULL_27115,
+                                                ObjectID.FARMING_HERB_PATCH_6,
                                                 new WorldPoint(1738, 3550, 0),
                                                 "Harvest your herbs from the Hosidius patch.",
                                                 CommonPatchRequirements.getHosidiusTeleport());
@@ -165,7 +166,7 @@ public enum HerbPatch implements FarmingPatchRequirements {
                         case CIVITAS_ILLA_FORTIS:
                                 harvestStep = new ObjectStep(
                                                 questHelper,
-                                                NullObjectID.NULL_50697,
+                                                ObjectID.FARMING_HERB_PATCH_8,
                                                 new WorldPoint(1582, 3094, 0),
                                                 "Harvest your herbs from the Varlamore patch.",
                                                 CommonPatchRequirements.getHunterWhistle());
@@ -190,7 +191,7 @@ public enum HerbPatch implements FarmingPatchRequirements {
                         case ARDOUGNE:
                                 plantStep = new ObjectStep(
                                                 questHelper,
-                                                NullObjectID.NULL_8152,
+                                                ObjectID.FARMING_HERB_PATCH_3,
                                                 new WorldPoint(2670, 3374, 0),
                                                 "Plant your seeds into the Ardougne patch.",
                                                 CommonPatchRequirements.getArdougneCloak());
@@ -198,7 +199,7 @@ public enum HerbPatch implements FarmingPatchRequirements {
                         case CATHERBY:
                                 plantStep = new ObjectStep(
                                                 questHelper,
-                                                NullObjectID.NULL_8151,
+                                                ObjectID.FARMING_HERB_PATCH_2,
                                                 new WorldPoint(2813, 3463, 0),
                                                 "Plant your seeds into the Catherby patch.",
                                                 CommonPatchRequirements.getCatherybyTeleport());
@@ -206,7 +207,7 @@ public enum HerbPatch implements FarmingPatchRequirements {
                         case FALADOR:
                                 plantStep = new ObjectStep(
                                                 questHelper,
-                                                NullObjectID.NULL_8150,
+                                                ObjectID.FARMING_HERB_PATCH_1,
                                                 new WorldPoint(3058, 3311, 0),
                                                 "Plant your seeds into the Faladar patch.",
                                                 CommonPatchRequirements.getExplorerRing());
@@ -214,7 +215,7 @@ public enum HerbPatch implements FarmingPatchRequirements {
                         case FARMING_GUILD:
                                 plantStep = new ObjectStep(
                                                 questHelper,
-                                                NullObjectID.NULL_33979,
+                                                ObjectID.FARMING_HERB_PATCH_7,
                                                 new WorldPoint(1238, 3726, 0),
                                                 "Plant your seeds into the Farming Guild patch.",
                                                 CommonPatchRequirements.getFarmingGuildTeleport());
@@ -223,7 +224,7 @@ public enum HerbPatch implements FarmingPatchRequirements {
                         case HARMONY:
                                 plantStep = new ObjectStep(
                                                 questHelper,
-                                                NullObjectID.NULL_8153,
+                                                ObjectID.FARMING_HERB_PATCH_5,
                                                 new WorldPoint(3789, 2837, 0),
                                                 "Plant your seeds into the Harmony patch.",
                                                 CommonPatchRequirements.getHarmonyIslandTeleport());
@@ -233,7 +234,7 @@ public enum HerbPatch implements FarmingPatchRequirements {
                         case MORYTANIA:
                                 plantStep = new ObjectStep(
                                                 questHelper,
-                                                NullObjectID.NULL_8153,
+                                                ObjectID.FARMING_HERB_PATCH_4,
                                                 new WorldPoint(3605, 3529, 0),
                                                 "Plant your seeds into the Morytania patch.",
                                                 CommonPatchRequirements.getEctophial());
@@ -241,7 +242,7 @@ public enum HerbPatch implements FarmingPatchRequirements {
                         case TROLL_STRONGHOLD:
                                 plantStep = new ObjectStep(
                                                 questHelper,
-                                                NullObjectID.NULL_18816,
+                                                ObjectID.MYARM_HERBPATCH,
                                                 new WorldPoint(826, 3694, 0),
                                                 "Plant your seeds into the Troll Stronghold patch.",
                                                 trollheimTeleport, stonyBasalt);
@@ -250,7 +251,7 @@ public enum HerbPatch implements FarmingPatchRequirements {
                         case WEISS:
                                 plantStep = new ObjectStep(
                                                 questHelper,
-                                                NullObjectID.NULL_33176,
+                                                ObjectID.MY2ARM_HERBPATCH,
                                                 new WorldPoint(2848, 3934, 0),
                                                 "Plant your seeds into the Weiss patch.",
                                                 icyBasalt);
@@ -259,7 +260,7 @@ public enum HerbPatch implements FarmingPatchRequirements {
                         case KOUREND:
                                 plantStep = new ObjectStep(
                                                 questHelper,
-                                                NullObjectID.NULL_27115,
+                                                ObjectID.FARMING_HERB_PATCH_6,
                                                 new WorldPoint(1738, 3550, 0),
                                                 "Plant your seeds into the Hosidius patch.",
                                                 CommonPatchRequirements.getHosidiusTeleport());
@@ -267,7 +268,7 @@ public enum HerbPatch implements FarmingPatchRequirements {
                         case CIVITAS_ILLA_FORTIS:
                                 plantStep = new ObjectStep(
                                                 questHelper,
-                                                NullObjectID.NULL_50697,
+                                                ObjectID.FARMING_HERB_PATCH_8,
                                                 new WorldPoint(1582, 3094, 0),
                                                 "Plant your seeds into the Varlamore patch.",
                                                 CommonPatchRequirements.getHunterWhistle());

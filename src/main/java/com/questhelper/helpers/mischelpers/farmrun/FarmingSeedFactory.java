@@ -8,7 +8,8 @@ import javax.annotation.Nullable;
 import com.google.inject.Singleton;
 import com.questhelper.helpers.mischelpers.farmrun.utils.PatchImplementation;
 
-import net.runelite.api.ItemID;
+import net.runelite.api.gameval.ItemID;
+
 
 @Singleton
 public class FarmingSeedFactory {
@@ -77,11 +78,11 @@ public class FarmingSeedFactory {
     }
 
     private final void setBushSeeds() {
-        bushSeeds.add(new FarmingSeed(ItemID.REDBERRY_SEED, "Redberry"));
-        bushSeeds.add(new FarmingSeed(ItemID.CADAVABERRY_SEED, "Cadavaberry"));
-        bushSeeds.add(new FarmingSeed(ItemID.DWELLBERRY_SEED, "Dwellberry"));
-        bushSeeds.add(new FarmingSeed(ItemID.JANGERBERRY_SEED, "Jangerberry"));
-        bushSeeds.add(new FarmingSeed(ItemID.WHITEBERRY_SEED, "Whiteberry"));
-        bushSeeds.add(new FarmingSeed(ItemID.POISON_IVY_SEED, "Poison ivy"));
+        bushSeeds.add(new FarmingSeed(ItemID.REDBERRY_BUSH_SEED, "Redberry"));
+        bushSeeds.add(new FarmingSeed(ItemID.CADAVABERRY_BUSH_SEED, "Cadavaberry"));
+        bushSeeds.add(new FarmingSeed(ItemID.DWELLBERRY_BUSH_SEED, "Dwellberry"));
+        bushSeeds.add(new FarmingSeed(ItemID.JANGERBERRY_BUSH_SEED, "Jangerberry"));
+        bushSeeds.add(new FarmingSeed(ItemID.WHITEBERRY_BUSH_SEED, "Whiteberry"));
+        bushSeeds.add(new FarmingSeed(ItemID.POISONIVY_BUSH_SEED, "Poison ivy"));
     }
 }

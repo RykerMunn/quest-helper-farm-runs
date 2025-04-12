@@ -10,7 +10,7 @@ import com.questhelper.helpers.mischelpers.farmrun.utils.FarmingPatchRequirement
 import com.questhelper.helpers.mischelpers.farmrun.utils.FarmingWorld;
 import com.questhelper.questhelpers.QuestHelper;
 
-import net.runelite.api.ItemID;
+import net.runelite.api.gameval.ItemID;
 import net.runelite.client.plugins.timetracking.Tab;
 /**
  * Manages herb runs.

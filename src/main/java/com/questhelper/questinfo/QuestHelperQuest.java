@@ -86,7 +86,7 @@ import com.questhelper.helpers.miniquests.themagearenai.TheMageArenaI;
 import com.questhelper.helpers.miniquests.themagearenaii.MA2Locator;
 import com.questhelper.helpers.miniquests.themagearenaii.TheMageArenaII;
 import com.questhelper.helpers.mischelpers.allneededitems.AllNeededItems;
-import com.questhelper.helpers.mischelpers.herbrun.HerbRun;
+import com.questhelper.helpers.mischelpers.farmrun.HerbRun;
 import com.questhelper.helpers.mischelpers.knightswaves.KnightWaves;
 import com.questhelper.helpers.mischelpers.strongholdofsecurity.StrongholdOfSecurity;
 import com.questhelper.helpers.quests.akingdomdivided.AKingdomDivided;
